@@ -1,7 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Moon, Sun, GraduationCap, ShoppingCart, User as UserIcon, Menu, Sparkles } from "lucide-react";
+import { Moon, Sun, GraduationCap, ShoppingCart, User as UserIcon, Menu, Sparkles, Languages, Shield } from "lucide-react";
 import { useTheme, useAuth, useCart } from "@/lib/store";
+import { useI18n, useT, LANGUAGES, type Lang } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,24 +10,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
-const NAV = [
-  { to: "/", label: "Home" },
-  { to: "/products", label: "Browse" },
-  { to: "/dashboard", label: "Dashboard" },
-];
 
 export function Header() {
   const { theme, toggle, init } = useTheme();
   const { user, logout } = useAuth();
   const items = useCart((s) => s.items);
+  const { lang, setLang } = useI18n();
+  const t = useT();
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     init();
   }, [init]);
+
+  const NAV = [
+    { to: "/", label: t("nav.home") },
+    { to: "/products", label: t("nav.browse") },
+    { to: "/dashboard", label: t("nav.dashboard") },
+    ...(user?.role === "admin" ? [{ to: "/admin", label: t("nav.admin") }] : []),
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full">
@@ -66,16 +71,45 @@ export function Header() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme" className="rounded-full hover:bg-white/5">
+          <div className="flex items-center gap-1.5">
+            {/* Language */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label={t("nav.language")} className="rounded-full hover:bg-white/5 relative">
+                  <Languages className="h-5 w-5" />
+                  <span className="absolute -bottom-0.5 -right-0.5 text-[9px] font-bold bg-gradient-neon text-white rounded-md px-1 leading-tight">
+                    {lang.toUpperCase()}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44 glass-strong border-white/10">
+                <DropdownMenuLabel className="text-xs uppercase tracking-wider text-muted-foreground">
+                  {t("nav.language")}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/10" />
+                {LANGUAGES.map((l) => (
+                  <DropdownMenuItem
+                    key={l.code}
+                    onClick={() => setLang(l.code as Lang)}
+                    className={`rounded-lg cursor-pointer flex items-center gap-2 ${lang === l.code ? "bg-white/5 text-foreground" : ""}`}
+                  >
+                    <span className="text-base">{l.flag}</span>
+                    <span className="font-medium">{l.label}</span>
+                    {lang === l.code && <Sparkles className="h-3 w-3 ms-auto text-[oklch(0.66_0.24_295)]" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button variant="ghost" size="icon" onClick={toggle} aria-label={t("nav.theme")} className="rounded-full hover:bg-white/5">
               {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
             <Link to="/cart" className="relative">
-              <Button variant="ghost" size="icon" aria-label="Cart" className="rounded-full hover:bg-white/5">
+              <Button variant="ghost" size="icon" aria-label={t("nav.cart")} className="rounded-full hover:bg-white/5">
                 <ShoppingCart className="h-5 w-5" />
                 {items.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-[oklch(0.78_0.18_65)] to-[oklch(0.65_0.25_25)] text-[10px] font-bold text-white shadow-lg">
+                  <span className="absolute -top-0.5 -end-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-[oklch(0.78_0.18_65)] to-[oklch(0.65_0.25_25)] text-[10px] font-bold text-white shadow-lg">
                     {items.length}
                   </span>
                 )}
@@ -101,16 +135,24 @@ export function Header() {
                   </div>
                   <DropdownMenuSeparator className="bg-white/10" />
                   <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
-                    <Link to="/dashboard">Dashboard</Link>
+                    <Link to="/dashboard">{t("nav.dashboard")}</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={logout} className="rounded-lg cursor-pointer">Logout</DropdownMenuItem>
+                  {user.role === "admin" && (
+                    <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                      <Link to="/admin">
+                        <Shield className="h-3.5 w-3.5 me-2" />
+                        {t("nav.admin")}
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={logout} className="rounded-lg cursor-pointer">{t("nav.signout")}</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <Link to="/auth" className="hidden sm:block">
                 <Button className="relative bg-gradient-neon text-white shadow-glow-blue hover:shadow-glow-purple hover:scale-105 transition-smooth font-semibold rounded-full px-5">
-                  <UserIcon className="h-4 w-4 mr-1.5" />
-                  Sign In
+                  <UserIcon className="h-4 w-4 me-1.5" />
+                  {t("nav.signin")}
                 </Button>
               </Link>
             )}
@@ -134,7 +176,7 @@ export function Header() {
                   ))}
                   {!user && (
                     <Link to="/auth" className="mt-4">
-                      <Button className="w-full bg-gradient-neon text-white shadow-glow-blue rounded-full font-semibold">Sign In</Button>
+                      <Button className="w-full bg-gradient-neon text-white shadow-glow-blue rounded-full font-semibold">{t("nav.signin")}</Button>
                     </Link>
                   )}
                 </div>
