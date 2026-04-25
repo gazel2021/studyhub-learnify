@@ -28,11 +28,12 @@ interface ThemeState {
 }
 
 export const useTheme = create<ThemeState>((set, get) => ({
-  theme: "light",
+  theme: "dark",
   toggle: () => {
-    const next = get().theme === "light" ? "dark" : "light";
+    const next = get().theme === "dark" ? "light" : "dark";
     if (typeof document !== "undefined") {
       document.documentElement.classList.toggle("dark", next === "dark");
+      document.documentElement.classList.toggle("light", next === "light");
       localStorage.setItem("theme", next);
     }
     set({ theme: next });
@@ -40,9 +41,9 @@ export const useTheme = create<ThemeState>((set, get) => ({
   init: () => {
     if (typeof window === "undefined") return;
     const saved = localStorage.getItem("theme") as "light" | "dark" | null;
-    const prefers = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const theme = saved ?? (prefers ? "dark" : "light");
+    const theme = saved ?? "dark"; // Dark by default — Neon AI vibe
     document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.classList.toggle("light", theme === "light");
     set({ theme });
   },
 }));
