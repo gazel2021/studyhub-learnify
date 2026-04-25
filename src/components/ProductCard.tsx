@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Star, Download, Sparkles, FileText, Brain, ScrollText } from "lucide-react";
 import type { Product } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 
 const badgeStyles: Record<string, string> = {
   Hot: "from-rose-500 via-pink-500 to-orange-400",
@@ -17,6 +18,7 @@ const typeIcon: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
   const Icon = typeIcon[product.type] ?? FileText;
+  const t = useT();
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -78,7 +80,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             {product.title}
           </h3>
           <p className="text-xs text-muted-foreground mb-4">
-            by <span className="font-medium text-foreground/80">{product.author}</span>
+            {t("card.by")} <span className="font-medium text-foreground/80">{product.author}</span>
           </p>
 
           <div className="flex items-center justify-between pt-3 border-t border-white/5">
@@ -87,7 +89,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
                 <div className="h-7 w-7 rounded-full bg-[oklch(0.78_0.20_150)]/15 flex items-center justify-center shadow-glow-green">
                   <Download className="h-3.5 w-3.5" />
                 </div>
-                Free
+                {t("card.free")}
               </div>
             ) : (
               <div className="flex items-baseline gap-0.5">
