@@ -2,22 +2,23 @@ import { Outlet, createRootRoute, HeadContent, Scripts, Link } from "@tanstack/r
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
-import { useI18nInit } from "@/lib/i18n";
+import { useI18nInit, useT } from "@/lib/i18n";
 
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
+  const t = useT();
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="max-w-md text-center">
         <h1 className="text-8xl font-black text-gradient-neon">404</h1>
-        <h2 className="mt-4 text-2xl font-bold">Page not found</h2>
-        <p className="mt-2 text-muted-foreground">The page you're looking for doesn't exist.</p>
+        <h2 className="mt-4 text-2xl font-bold font-display">{t("common.notfound.t")}</h2>
+        <p className="mt-2 text-muted-foreground">{t("common.notfound.d")}</p>
         <Link
           to="/"
-          className="mt-6 inline-flex items-center justify-center rounded-full bg-gradient-neon text-white px-6 py-3 font-medium shadow-glow-blue hover:scale-105 transition-smooth"
+          className="mt-6 inline-flex items-center justify-center rounded-full bg-gradient-neon text-white px-6 py-3 font-bold shadow-glow-blue hover:scale-105 transition-smooth"
         >
-          Back home
+          {t("common.backHome")}
         </Link>
       </div>
     </div>
