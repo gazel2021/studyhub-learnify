@@ -1272,10 +1272,39 @@ export const useI18n = create<I18nState>((set) => ({
   },
 }));
 
+/** Read custom taxonomy labels from persisted settings (avoids module cycle). */
+function readCustomLabel(key: string, lang: Lang): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem("studyhub-settings-v1");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const s = parsed?.state ?? parsed;
+    const lookup = (
+      list: { key?: string; code?: string; label: { ar: string; en: string; fr: string } }[] | undefined,
+      keyOrCode: string,
+    ) => {
+      if (!list) return null;
+      const found = list.find((x) => x.key === keyOrCode || x.code === keyOrCode);
+      return found ? (found.label[lang] || found.label.en) : null;
+    };
+    if (key.startsWith("subject.")) return lookup(s.customSubjects, key.slice(8));
+    if (key.startsWith("country.")) return lookup(s.customCountries, key.slice(8));
+    if (key.startsWith("stage.")) return lookup(s.customStages, key.slice(6));
+    if (key.startsWith("type.")) return lookup(s.customTypes, key.slice(5));
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function useT() {
   const lang = useI18n((s) => s.lang);
   return (key: string, vars?: Record<string, string | number>) => {
-    let val = TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS.en[key] ?? key;
+    let val: string | undefined = TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS.en[key];
+    if (val === undefined) {
+      val = readCustomLabel(key, lang) ?? key;
+    }
     if (vars) {
       for (const [k, v] of Object.entries(vars)) {
         val = val.replace(`{${k}}`, String(v));
