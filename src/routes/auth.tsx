@@ -1,11 +1,12 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { GraduationCap, BookOpen, Shield, Mail, Lock, User, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { GraduationCap, BookOpen, Shield, Mail, Lock, User, Sparkles, KeyRound, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth, type Role } from "@/lib/store";
+import { useUsers } from "@/lib/users";
 import { useT } from "@/lib/i18n";
 import { toast } from "sonner";
 
@@ -13,16 +14,24 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+type Step = "role" | "form" | "otp";
+
 function AuthPage() {
   const t = useT();
-  const [step, setStep] = useState<1 | 2>(1);
+  const navigate = useNavigate();
+  const login = useAuth((s) => s.login);
+  const startSignup = useUsers((s) => s.startSignup);
+  const verifyOtp = useUsers((s) => s.verifyOtp);
+  const resendOtp = useUsers((s) => s.resendOtp);
+  const signIn = useUsers((s) => s.signIn);
+
+  const [mode, setMode] = useState<"signup" | "login">("signup");
+  const [step, setStep] = useState<Step>("role");
   const [role, setRole] = useState<Role>("student");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
-  const [mode, setMode] = useState<"signup" | "login">("signup");
-  const login = useAuth((s) => s.login);
-  const navigate = useNavigate();
+  const [otpCode, setOtpCode] = useState("");
 
   const ROLES: { id: Role; title: string; desc: string; icon: typeof BookOpen }[] = [
     { id: "student", title: t("auth.role.student.t"), desc: t("auth.role.student.d"), icon: BookOpen },
@@ -30,17 +39,61 @@ function AuthPage() {
     { id: "admin", title: t("auth.role.admin.t"), desc: t("auth.role.admin.d"), icon: Shield },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const errMsg = (e?: string) => {
+    const map: Record<string, string> = {
+      EMAIL_EXISTS: t("auth.error.exists"),
+      BAD_EMAIL: t("auth.error.badEmail"),
+      SHORT_PW: t("auth.error.shortPw"),
+      NOT_FOUND: t("auth.error.notFound"),
+      NOT_VERIFIED: t("auth.error.notVerified"),
+      DISABLED: t("auth.error.disabled"),
+      BAD_PW: t("auth.error.badPw"),
+      BAD_CODE: t("auth.otp.bad"),
+      EXPIRED: t("auth.otp.expired"),
+      NO_PENDING: t("auth.otp.noPending"),
+    };
+    return e ? map[e] ?? e : "";
+  };
+
+  const handleSignupSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !email || !pw) return toast.error(t("auth.fillAll"));
+    const r = startSignup({ name, email, password: pw, role });
+    if (r.error) return toast.error(errMsg(r.error));
+    setStep("otp");
+    toast.success(t("auth.otp.sent", { code: r.code }), { duration: 10_000 });
+  };
+
+  const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !pw) return toast.error(t("auth.fillAll"));
-    login({
-      id: crypto.randomUUID(),
-      name: name || email.split("@")[0],
-      email,
-      role,
-    });
-    toast.success(`${t("auth.welcome")}${name ? `، ${name}` : "!"}`);
-    navigate({ to: "/dashboard" });
+    const r = signIn(email, pw);
+    if (r.error || !r.user) return toast.error(errMsg(r.error));
+    login({ id: r.user.id, name: r.user.name, email: r.user.email, role: r.user.role });
+    toast.success(`${t("auth.welcome")}، ${r.user.name}`);
+    navigate({ to: r.user.role === "admin" ? "/admin" : "/dashboard" });
+  };
+
+  const handleVerify = (e: React.FormEvent) => {
+    e.preventDefault();
+    const r = verifyOtp(email, otpCode);
+    if (r.error || !r.user) return toast.error(errMsg(r.error));
+    login({ id: r.user.id, name: r.user.name, email: r.user.email, role: r.user.role });
+    toast.success(`${t("auth.welcome")}، ${r.user.name}`);
+    navigate({ to: r.user.role === "admin" ? "/admin" : "/dashboard" });
+  };
+
+  const handleResend = () => {
+    const r = resendOtp(email);
+    if (r.error) return toast.error(errMsg(r.error));
+    toast.success(t("auth.otp.resent", { code: r.code }), { duration: 10_000 });
+  };
+
+  const useDemoAdmin = () => {
+    setMode("login");
+    setStep("form");
+    setEmail("owner@studyhub.app");
+    setPw("owner123");
   };
 
   return (
@@ -55,93 +108,168 @@ function AuthPage() {
             StudyHub
           </div>
           <h1 className="text-3xl md:text-4xl font-bold font-display">
-            {mode === "signup" ? t("auth.signup.title") : t("auth.signin.title")}
+            {step === "otp"
+              ? t("auth.otp.title")
+              : mode === "signup"
+              ? t("auth.signup.title")
+              : t("auth.signin.title")}
           </h1>
           <p className="mt-2 text-muted-foreground text-sm">
-            {mode === "signup" ? t("auth.signup.subtitle") : t("auth.signin.subtitle")}
+            {step === "otp"
+              ? t("auth.otp.subtitle", { email })
+              : mode === "signup"
+              ? t("auth.signup.subtitle")
+              : t("auth.signin.subtitle")}
           </p>
         </div>
 
         <div className="glass-strong border-gradient rounded-3xl p-6 md:p-8">
-          {mode === "signup" && step === 1 ? (
-            <>
-              <h2 className="text-sm font-semibold mb-4 text-muted-foreground uppercase tracking-wide">
-                {t("auth.role.title")}
-              </h2>
-              <div className="space-y-3">
-                {ROLES.map((r) => (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => setRole(r.id)}
-                    className={`w-full text-start p-4 rounded-2xl border-2 transition-smooth flex items-center gap-4 ${
-                      role === r.id
-                        ? "border-[oklch(0.68_0.22_255)]/60 bg-white/5 shadow-glow-blue"
-                        : "border-white/5 hover:border-white/20"
-                    }`}
-                  >
-                    <div className={`h-11 w-11 rounded-xl flex items-center justify-center ${
-                      role === r.id ? "bg-gradient-neon text-white shadow-glow-blue" : "bg-white/5 text-muted-foreground"
-                    }`}>
-                      <r.icon className="h-5 w-5" />
+          <AnimatePresence mode="wait">
+            {/* SIGN-UP STEP 1: ROLE */}
+            {mode === "signup" && step === "role" && (
+              <motion.div key="role" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                <h2 className="text-sm font-semibold mb-4 text-muted-foreground uppercase tracking-wide">
+                  {t("auth.role.title")}
+                </h2>
+                <div className="space-y-3">
+                  {ROLES.map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => setRole(r.id)}
+                      className={`w-full text-start p-4 rounded-2xl border-2 transition-smooth flex items-center gap-4 ${
+                        role === r.id
+                          ? "border-[oklch(0.68_0.22_255)]/60 bg-white/5 shadow-glow-blue"
+                          : "border-white/5 hover:border-white/20"
+                      }`}
+                    >
+                      <div className={`h-11 w-11 rounded-xl flex items-center justify-center ${
+                        role === r.id ? "bg-gradient-neon text-white shadow-glow-blue" : "bg-white/5 text-muted-foreground"
+                      }`}>
+                        <r.icon className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold">{r.title}</div>
+                        <div className="text-xs text-muted-foreground">{r.desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <Button onClick={() => setStep("form")} className="w-full mt-6 h-12 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue">
+                  {t("auth.continue")}
+                </Button>
+              </motion.div>
+            )}
+
+            {/* SIGN-UP STEP 2 / LOGIN: form */}
+            {step === "form" && (
+              <motion.form
+                key="form"
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+                onSubmit={mode === "signup" ? handleSignupSubmit : handleLoginSubmit}
+                className="space-y-4"
+              >
+                {mode === "signup" && (
+                  <div>
+                    <Label htmlFor="name">{t("auth.name")}</Label>
+                    <div className="relative mt-1.5">
+                      <User className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="ps-10 h-11 rounded-xl bg-background/50" required />
                     </div>
-                    <div className="flex-1">
-                      <div className="font-semibold">{r.title}</div>
-                      <div className="text-xs text-muted-foreground">{r.desc}</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <Button onClick={() => setStep(2)} className="w-full mt-6 h-12 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue">
-                {t("auth.continue")}
-              </Button>
-            </>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {mode === "signup" && (
+                  </div>
+                )}
                 <div>
-                  <Label htmlFor="name">{t("auth.name")}</Label>
+                  <Label htmlFor="email">{t("auth.email")}</Label>
                   <div className="relative mt-1.5">
-                    <User className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="ps-10 h-11 rounded-xl bg-background/50" />
+                    <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="ps-10 h-11 rounded-xl bg-background/50" placeholder="you@example.com" required />
                   </div>
                 </div>
-              )}
-              <div>
-                <Label htmlFor="email">{t("auth.email")}</Label>
-                <div className="relative mt-1.5">
-                  <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="ps-10 h-11 rounded-xl bg-background/50" placeholder="you@example.com" required />
+                <div>
+                  <Label htmlFor="pw">{t("auth.password")}</Label>
+                  <div className="relative mt-1.5">
+                    <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input id="pw" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} value={pw} onChange={(e) => setPw(e.target.value)} className="ps-10 h-11 rounded-xl bg-background/50" placeholder="••••••••" required />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <Label htmlFor="pw">{t("auth.password")}</Label>
-                <div className="relative mt-1.5">
-                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="pw" type="password" value={pw} onChange={(e) => setPw(e.target.value)} className="ps-10 h-11 rounded-xl bg-background/50" placeholder="••••••••" required />
-                </div>
-              </div>
-              <Button type="submit" className="w-full h-12 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple transition-smooth">
-                {mode === "signup" ? t("auth.create") : t("auth.signin")}
-              </Button>
-              {mode === "signup" && (
-                <Button type="button" variant="ghost" className="w-full" onClick={() => setStep(1)}>
-                  {t("auth.changeRole")}
+                <Button type="submit" className="w-full h-12 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple transition-smooth">
+                  {mode === "signup" ? t("auth.create") : t("auth.signin")}
                 </Button>
-              )}
-            </form>
-          )}
+                {mode === "signup" && (
+                  <Button type="button" variant="ghost" className="w-full" onClick={() => setStep("role")}>
+                    {t("auth.changeRole")}
+                  </Button>
+                )}
 
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            {mode === "signup" ? t("auth.haveAccount") : t("auth.noAccount")}{" "}
-            <button
-              type="button"
-              onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setStep(mode === "signup" ? 2 : 1); }}
-              className="text-gradient-neon font-bold hover:opacity-80"
-            >
-              {mode === "signup" ? t("auth.signin") : t("auth.create")}
-            </button>
-          </div>
+                {mode === "login" && (
+                  <button type="button" onClick={useDemoAdmin}
+                    className="block w-full text-center text-xs text-muted-foreground hover:text-foreground underline-offset-4 hover:underline">
+                    🛡 {t("auth.useDemo")}: owner@studyhub.app / owner123
+                  </button>
+                )}
+              </motion.form>
+            )}
+
+            {/* OTP step */}
+            {step === "otp" && (
+              <motion.form
+                key="otp"
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+                onSubmit={handleVerify}
+                className="space-y-4"
+              >
+                <div className="rounded-2xl bg-amber-500/10 border border-amber-400/30 p-3 text-xs text-amber-300">
+                  ⚠️ {t("auth.otp.demoNote")}
+                </div>
+                <div>
+                  <Label htmlFor="otp">{t("auth.otp.code")}</Label>
+                  <div className="relative mt-1.5">
+                    <KeyRound className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="otp" inputMode="numeric" maxLength={6}
+                      value={otpCode} onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                      className="ps-10 h-12 text-center text-2xl tracking-[0.5em] font-mono rounded-xl bg-background/50"
+                      placeholder="------" required
+                    />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full h-12 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue">
+                  {t("auth.otp.verify")}
+                </Button>
+                <div className="flex justify-between">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setStep("form")}>
+                    <ArrowLeft className="h-3.5 w-3.5 me-1" /> {t("auth.back")}
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={handleResend}>
+                    {t("auth.otp.resend")}
+                  </Button>
+                </div>
+              </motion.form>
+            )}
+          </AnimatePresence>
+
+          {step !== "otp" && (
+            <div className="mt-6 text-center text-sm text-muted-foreground">
+              {mode === "signup" ? t("auth.haveAccount") : t("auth.noAccount")}{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setMode(mode === "signup" ? "login" : "signup");
+                  setStep(mode === "signup" ? "form" : "role");
+                  setOtpCode("");
+                }}
+                className="text-gradient-neon font-bold hover:opacity-80"
+              >
+                {mode === "signup" ? t("auth.signin") : t("auth.create")}
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 text-center">
+          <Link to="/" className="text-xs text-muted-foreground hover:text-foreground">
+            ← {t("common.backHome")}
+          </Link>
         </div>
       </motion.div>
     </div>
