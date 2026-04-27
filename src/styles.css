@@ -88,14 +88,12 @@
   --pi: oklch(0.66 0.24 295);
   --pi-foreground: oklch(0.99 0 0);
 
-  /* Gradients & glows */
+  /* Gradients & glows — softer, lighter */
   --gradient-brand: linear-gradient(135deg, oklch(0.68 0.22 255), oklch(0.66 0.24 295));
   --gradient-neon: linear-gradient(135deg, oklch(0.68 0.22 255), oklch(0.66 0.24 295) 50%, oklch(0.72 0.25 350));
   --gradient-mesh:
-    radial-gradient(at 15% 10%, oklch(0.68 0.22 255 / 0.18) 0px, transparent 45%),
-    radial-gradient(at 85% 5%, oklch(0.66 0.24 295 / 0.22) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, oklch(0.72 0.25 350 / 0.10) 0px, transparent 55%),
-    radial-gradient(at 25% 95%, oklch(0.78 0.20 150 / 0.10) 0px, transparent 50%);
+    radial-gradient(at 20% 10%, oklch(0.68 0.22 255 / 0.08) 0px, transparent 45%),
+    radial-gradient(at 85% 5%, oklch(0.66 0.24 295 / 0.10) 0px, transparent 50%);
 
   /* Subtle grid overlay — lighter */
   --grid-color: oklch(1 0 0 / 0.025);
