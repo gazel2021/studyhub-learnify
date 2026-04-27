@@ -348,3 +348,21 @@
   to { --angle: 360deg; }
 }
 .animate-conic { animation: spin-angle 6s linear infinite; }
+
+/* Respect reduced motion + lighter browsing on small screens */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (max-width: 768px) {
+  body { background-image: none; background-color: var(--color-background); }
+  .glass, .glass-strong {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .animate-blob, .animate-orbit, .animate-spin-slow, .animate-conic { animation: none; }
+}
