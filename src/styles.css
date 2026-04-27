@@ -88,26 +88,24 @@
   --pi: oklch(0.66 0.24 295);
   --pi-foreground: oklch(0.99 0 0);
 
-  /* Gradients & glows */
+  /* Gradients & glows — softer, lighter */
   --gradient-brand: linear-gradient(135deg, oklch(0.68 0.22 255), oklch(0.66 0.24 295));
   --gradient-neon: linear-gradient(135deg, oklch(0.68 0.22 255), oklch(0.66 0.24 295) 50%, oklch(0.72 0.25 350));
   --gradient-mesh:
-    radial-gradient(at 15% 10%, oklch(0.68 0.22 255 / 0.18) 0px, transparent 45%),
-    radial-gradient(at 85% 5%, oklch(0.66 0.24 295 / 0.22) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, oklch(0.72 0.25 350 / 0.10) 0px, transparent 55%),
-    radial-gradient(at 25% 95%, oklch(0.78 0.20 150 / 0.10) 0px, transparent 50%);
+    radial-gradient(at 20% 10%, oklch(0.68 0.22 255 / 0.08) 0px, transparent 45%),
+    radial-gradient(at 85% 5%, oklch(0.66 0.24 295 / 0.10) 0px, transparent 50%);
 
-  /* Subtle grid overlay */
-  --grid-color: oklch(1 0 0 / 0.04);
+  /* Subtle grid overlay — lighter */
+  --grid-color: oklch(1 0 0 / 0.025);
 
-  /* Shadows = Neon glows */
-  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.4), 0 4px 24px oklch(0 0 0 / 0.35);
-  --shadow-elegant: 0 12px 40px -8px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.4);
-  --shadow-glow-blue: 0 0 0 1px oklch(0.68 0.22 255 / 0.4), 0 0 32px oklch(0.68 0.22 255 / 0.45), 0 0 80px oklch(0.68 0.22 255 / 0.25);
-  --shadow-glow-purple: 0 0 0 1px oklch(0.66 0.24 295 / 0.4), 0 0 32px oklch(0.66 0.24 295 / 0.45), 0 0 80px oklch(0.66 0.24 295 / 0.25);
-  --shadow-glow-green: 0 0 0 1px oklch(0.78 0.20 150 / 0.4), 0 0 32px oklch(0.78 0.20 150 / 0.45);
-  --shadow-glow: 0 0 60px oklch(0.68 0.22 270 / 0.45);
-  --shadow-pop: 0 20px 60px -12px oklch(0.68 0.22 270 / 0.45), 0 8px 24px oklch(0 0 0 / 0.5);
+  /* Shadows = lighter glows for faster, less heavy browsing */
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.3), 0 2px 10px oklch(0 0 0 / 0.2);
+  --shadow-elegant: 0 6px 20px -6px oklch(0 0 0 / 0.35), 0 1px 3px oklch(0 0 0 / 0.25);
+  --shadow-glow-blue: 0 0 0 1px oklch(0.68 0.22 255 / 0.25), 0 0 16px oklch(0.68 0.22 255 / 0.22);
+  --shadow-glow-purple: 0 0 0 1px oklch(0.66 0.24 295 / 0.25), 0 0 16px oklch(0.66 0.24 295 / 0.22);
+  --shadow-glow-green: 0 0 0 1px oklch(0.78 0.20 150 / 0.25), 0 0 16px oklch(0.78 0.20 150 / 0.22);
+  --shadow-glow: 0 0 28px oklch(0.68 0.22 270 / 0.22);
+  --shadow-pop: 0 10px 28px -10px oklch(0.68 0.22 270 / 0.22), 0 4px 12px oklch(0 0 0 / 0.3);
 
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -149,13 +147,9 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    background-image:
-      var(--gradient-mesh),
-      linear-gradient(var(--grid-color) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-    background-size: auto, 56px 56px, 56px 56px;
-    background-attachment: fixed;
-    background-position: 0 0, -1px -1px, -1px -1px;
+    background-image: var(--gradient-mesh);
+    background-attachment: scroll;
+    background-repeat: no-repeat;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -208,19 +202,19 @@
 
   .glass {
     background: linear-gradient(135deg,
-      color-mix(in oklab, var(--card) 70%, transparent),
-      color-mix(in oklab, var(--card) 50%, transparent));
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid color-mix(in oklab, white 8%, transparent);
+      color-mix(in oklab, var(--card) 80%, transparent),
+      color-mix(in oklab, var(--card) 65%, transparent));
+    backdrop-filter: blur(10px) saturate(140%);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    border: 1px solid color-mix(in oklab, white 6%, transparent);
   }
   .glass-strong {
     background: linear-gradient(135deg,
-      color-mix(in oklab, var(--card) 88%, transparent),
-      color-mix(in oklab, var(--card) 70%, transparent));
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid color-mix(in oklab, white 10%, transparent);
+      color-mix(in oklab, var(--card) 92%, transparent),
+      color-mix(in oklab, var(--card) 80%, transparent));
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    border: 1px solid color-mix(in oklab, white 8%, transparent);
   }
   .bg-gradient-soft {
     background-image: linear-gradient(135deg,
@@ -311,10 +305,10 @@
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px oklch(0.68 0.22 255 / 0.5), 0 0 40px oklch(0.68 0.22 255 / 0.3); }
-  50% { box-shadow: 0 0 32px oklch(0.66 0.24 295 / 0.7), 0 0 64px oklch(0.66 0.24 295 / 0.4); }
+  0%, 100% { box-shadow: 0 0 12px oklch(0.68 0.22 255 / 0.3); }
+  50% { box-shadow: 0 0 18px oklch(0.66 0.24 295 / 0.4); }
 }
-.animate-glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
+.animate-glow-pulse { animation: glow-pulse 4s ease-in-out infinite; }
 
 @keyframes shimmer {
   0% { background-position: -200% 0; }
@@ -354,3 +348,21 @@
   to { --angle: 360deg; }
 }
 .animate-conic { animation: spin-angle 6s linear infinite; }
+
+/* Respect reduced motion + lighter browsing on small screens */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (max-width: 768px) {
+  body { background-image: none; background-color: var(--color-background); }
+  .glass, .glass-strong {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .animate-blob, .animate-orbit, .animate-spin-slow, .animate-conic { animation: none; }
+}
