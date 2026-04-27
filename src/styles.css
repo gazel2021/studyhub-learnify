@@ -147,13 +147,9 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    background-image:
-      var(--gradient-mesh),
-      linear-gradient(var(--grid-color) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-    background-size: auto, 56px 56px, 56px 56px;
-    background-attachment: fixed;
-    background-position: 0 0, -1px -1px, -1px -1px;
+    background-image: var(--gradient-mesh);
+    background-attachment: scroll;
+    background-repeat: no-repeat;
   }
 
   h1, h2, h3, h4, h5, h6 {
