@@ -130,12 +130,17 @@ function UploadPage() {
           </Field>
 
           <Field label={t("admin.form.type")}>
-            <Select value={form.type} onValueChange={(v: "book" | "exam" | "quiz") => setForm({ ...form, type: v })}>
+            <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as typeof form.type })}>
               <SelectTrigger className="h-11 rounded-xl bg-background/50"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="book"><FileText className="h-3.5 w-3.5 inline me-2" />{t("admin.type.book")}</SelectItem>
-                <SelectItem value="exam"><ScrollText className="h-3.5 w-3.5 inline me-2" />{t("admin.type.exam")}</SelectItem>
-                <SelectItem value="quiz"><Brain className="h-3.5 w-3.5 inline me-2" />{t("admin.type.quiz")}</SelectItem>
+                {typeOptions.map((o) => {
+                  const Icon = o.icon;
+                  return (
+                    <SelectItem key={o.value} value={o.value}>
+                      <Icon className="h-3.5 w-3.5 inline me-2" />{o.label}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </Field>
@@ -144,8 +149,8 @@ function UploadPage() {
             <Select value={form.subject} onValueChange={(v) => setForm({ ...form, subject: v })}>
               <SelectTrigger className="h-11 rounded-xl bg-background/50"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {SUBJECTS.map((s) => (
-                  <SelectItem key={s.key} value={s.key}>{t(`subject.${s.key}`)}</SelectItem>
+                {subjectOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -155,8 +160,8 @@ function UploadPage() {
             <Select value={form.country} onValueChange={(v) => setForm({ ...form, country: v })}>
               <SelectTrigger className="h-11 rounded-xl bg-background/50"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c} value={c}>{t(`country.${c}`)}</SelectItem>
+                {countryOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -166,7 +171,9 @@ function UploadPage() {
             <Select value={form.stage} onValueChange={(v) => setForm({ ...form, stage: v })}>
               <SelectTrigger className="h-11 rounded-xl bg-background/50"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {STAGES.map((s) => <SelectItem key={s} value={s}>{t(`stage.${s}`)}</SelectItem>)}
+                {stageOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </Field>
