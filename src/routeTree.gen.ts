@@ -29,6 +29,11 @@ import { Route as ReaderIdRouteImport } from './routes/reader.$id'
 import { Route as QuizIdRouteImport } from './routes/quiz.$id'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
 
+const CodeRoute = CodeRouteImport.update({
+  id: '/code',
+  path: '/code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UploadRoute = UploadRouteImport.update({
   id: '/upload',
   path: '/upload',
