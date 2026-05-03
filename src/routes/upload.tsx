@@ -23,6 +23,27 @@ function UploadPage() {
   const user = useAuth((s) => s.user);
   const submit = useProducts((s) => s.submit);
   const navigate = useNavigate();
+  const settings = useSettings();
+
+  // Merge built-in taxonomy with admin-added entries
+  const subjectOptions = [
+    ...SUBJECTS.map((x) => ({ value: x.key, label: t(`subject.${x.key}`) })),
+    ...settings.customSubjects.map((x) => ({ value: x.key, label: x.label.ar })),
+  ];
+  const countryOptions = [
+    ...COUNTRIES.map((c) => ({ value: c, label: t(`country.${c}`) })),
+    ...settings.customCountries.map((x) => ({ value: x.code, label: x.label.ar })),
+  ];
+  const stageOptions = [
+    ...STAGES.map((s) => ({ value: s, label: t(`stage.${s}`) })),
+    ...settings.customStages.map((x) => ({ value: x.key, label: x.label.ar })),
+  ];
+  const typeOptions = [
+    { value: "book", label: t("admin.type.book"), icon: FileText },
+    { value: "exam", label: t("admin.type.exam"), icon: ScrollText },
+    { value: "quiz", label: t("admin.type.quiz"), icon: Brain },
+    ...settings.customTypes.map((x) => ({ value: x.key, label: x.label.ar, icon: Tag })),
+  ];
 
   const [form, setForm] = useState({
     title: "",
