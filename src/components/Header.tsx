@@ -1,7 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Moon, Sun, GraduationCap, ShoppingCart, User as UserIcon, Menu, Sparkles, Languages, Shield } from "lucide-react";
+import { Moon, Sun, GraduationCap, ShoppingCart, User as UserIcon, Menu, Sparkles, Languages, Shield, Settings as SettingsIcon, Code2, Upload as UploadIcon } from "lucide-react";
 import { useTheme, useAuth, useCart } from "@/lib/store";
+import { useUsers, hasPermission } from "@/lib/users";
+import { useSettings } from "@/lib/settings";
 import { useI18n, useT, LANGUAGES, type Lang } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import {
