@@ -148,14 +148,43 @@ export function Header() {
                   <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
                     <Link to="/dashboard">{t("nav.dashboard")}</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <Link to="/profile">
+                      <UserIcon className="h-3.5 w-3.5 me-2" />
+                      {t("profile.title")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <Link to="/upload">
+                      <UploadIcon className="h-3.5 w-3.5 me-2" />
+                      {t("nav.upload")}
+                    </Link>
+                  </DropdownMenuItem>
                   {user.role === "admin" && (
-                    <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
-                      <Link to="/admin">
-                        <Shield className="h-3.5 w-3.5 me-2" />
-                        {t("nav.admin")}
-                      </Link>
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                        <Link to="/admin">
+                          <Shield className="h-3.5 w-3.5 me-2" />
+                          {t("nav.admin")}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                        <Link to="/settings">
+                          <SettingsIcon className="h-3.5 w-3.5 me-2" />
+                          {t("nav.settings")}
+                        </Link>
+                      </DropdownMenuItem>
+                      {canViewCode && (
+                        <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                          <Link to="/code">
+                            <Code2 className="h-3.5 w-3.5 me-2" />
+                            {t("nav.code")}
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                    </>
                   )}
+                  <DropdownMenuSeparator className="bg-white/10" />
                   <DropdownMenuItem onClick={logout} className="rounded-lg cursor-pointer">{t("nav.signout")}</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
