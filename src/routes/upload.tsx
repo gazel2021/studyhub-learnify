@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Upload as UploadIcon, ShieldAlert, FileText, ScrollText, Brain } from "lucide-react";
+import { Plus, Upload as UploadIcon, ShieldAlert, FileText, ScrollText, Brain, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/store";
 import { useProducts } from "@/lib/products";
