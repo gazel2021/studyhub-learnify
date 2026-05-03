@@ -48,12 +48,16 @@ export function Header() {
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="relative">
               <div className="absolute inset-0 rounded-xl bg-gradient-neon blur-lg opacity-60 group-hover:opacity-100 transition-opacity" />
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-neon shadow-glow-blue">
-                <GraduationCap className="h-5 w-5 text-white" />
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-neon shadow-glow-blue overflow-hidden">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="logo" className="h-full w-full object-contain" />
+                ) : (
+                  <GraduationCap className="h-5 w-5 text-white" />
+                )}
               </div>
             </div>
             <span className="text-xl font-bold tracking-tight font-display">
-              Study<span className="text-gradient-neon">Hub</span>
+              {appName || "StudyHub"}
             </span>
           </Link>
 
