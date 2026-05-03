@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/store";
 import { useProducts } from "@/lib/products";
 import { useT } from "@/lib/i18n";
+import { useSettings } from "@/lib/settings";
 import { SUBJECTS, COUNTRIES, STAGES } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
