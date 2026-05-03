@@ -19,6 +19,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 export function Header() {
   const { theme, toggle, init } = useTheme();
   const { user, logout } = useAuth();
+  const account = useUsers((s) => (user ? s.users.find((u) => u.id === user.id) : undefined));
+  const { logoUrl, appName } = useSettings();
   const items = useCart((s) => s.items);
   const { lang, setLang } = useI18n();
   const t = useT();
@@ -28,10 +30,13 @@ export function Header() {
     init();
   }, [init]);
 
+  const canViewCode = hasPermission(account, "view_code");
+
   const NAV = [
     { to: "/", label: t("nav.home") },
     { to: "/products", label: t("nav.browse") },
     { to: "/dashboard", label: t("nav.dashboard") },
+    ...(user ? [{ to: "/upload", label: t("nav.upload") }] : []),
     ...(user?.role === "admin" ? [{ to: "/admin", label: t("nav.admin") }] : []),
   ];
 
