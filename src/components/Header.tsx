@@ -1,7 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Moon, Sun, GraduationCap, ShoppingCart, User as UserIcon, Menu, Sparkles, Languages, Shield } from "lucide-react";
+import { Moon, Sun, GraduationCap, ShoppingCart, User as UserIcon, Menu, Sparkles, Languages, Shield, Settings as SettingsIcon, Code2, Upload as UploadIcon } from "lucide-react";
 import { useTheme, useAuth, useCart } from "@/lib/store";
+import { useUsers, hasPermission } from "@/lib/users";
+import { useSettings } from "@/lib/settings";
 import { useI18n, useT, LANGUAGES, type Lang } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +19,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 export function Header() {
   const { theme, toggle, init } = useTheme();
   const { user, logout } = useAuth();
+  const account = useUsers((s) => (user ? s.users.find((u) => u.id === user.id) : undefined));
+  const { logoUrl, appName } = useSettings();
   const items = useCart((s) => s.items);
   const { lang, setLang } = useI18n();
   const t = useT();
@@ -26,10 +30,13 @@ export function Header() {
     init();
   }, [init]);
 
+  const canViewCode = hasPermission(account, "view_code");
+
   const NAV = [
     { to: "/", label: t("nav.home") },
     { to: "/products", label: t("nav.browse") },
     { to: "/dashboard", label: t("nav.dashboard") },
+    ...(user ? [{ to: "/upload", label: t("nav.upload") }] : []),
     ...(user?.role === "admin" ? [{ to: "/admin", label: t("nav.admin") }] : []),
   ];
 
@@ -41,12 +48,16 @@ export function Header() {
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="relative">
               <div className="absolute inset-0 rounded-xl bg-gradient-neon blur-lg opacity-60 group-hover:opacity-100 transition-opacity" />
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-neon shadow-glow-blue">
-                <GraduationCap className="h-5 w-5 text-white" />
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-neon shadow-glow-blue overflow-hidden">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="logo" className="h-full w-full object-contain" />
+                ) : (
+                  <GraduationCap className="h-5 w-5 text-white" />
+                )}
               </div>
             </div>
             <span className="text-xl font-bold tracking-tight font-display">
-              Study<span className="text-gradient-neon">Hub</span>
+              {appName || "StudyHub"}
             </span>
           </Link>
 
@@ -137,14 +148,43 @@ export function Header() {
                   <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
                     <Link to="/dashboard">{t("nav.dashboard")}</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <Link to="/profile">
+                      <UserIcon className="h-3.5 w-3.5 me-2" />
+                      {t("profile.title")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <Link to="/upload">
+                      <UploadIcon className="h-3.5 w-3.5 me-2" />
+                      {t("nav.upload")}
+                    </Link>
+                  </DropdownMenuItem>
                   {user.role === "admin" && (
-                    <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
-                      <Link to="/admin">
-                        <Shield className="h-3.5 w-3.5 me-2" />
-                        {t("nav.admin")}
-                      </Link>
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                        <Link to="/admin">
+                          <Shield className="h-3.5 w-3.5 me-2" />
+                          {t("nav.admin")}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                        <Link to="/settings">
+                          <SettingsIcon className="h-3.5 w-3.5 me-2" />
+                          {t("nav.settings")}
+                        </Link>
+                      </DropdownMenuItem>
+                      {canViewCode && (
+                        <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                          <Link to="/code">
+                            <Code2 className="h-3.5 w-3.5 me-2" />
+                            {t("nav.code")}
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                    </>
                   )}
+                  <DropdownMenuSeparator className="bg-white/10" />
                   <DropdownMenuItem onClick={logout} className="rounded-lg cursor-pointer">{t("nav.signout")}</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
