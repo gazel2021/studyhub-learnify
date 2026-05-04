@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Upload as UploadIcon, ShieldAlert, FileText, ScrollText, Brain, Tag } from "lucide-react";
+import { Plus, Upload as UploadIcon, ShieldAlert, FileText, ScrollText, Brain, Tag, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/store";
 import { useProducts } from "@/lib/products";
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/upload")({
   component: UploadPage,
@@ -146,36 +147,76 @@ function UploadPage() {
           </Field>
 
           <Field label={t("admin.form.subject")}>
-            <Select value={form.subject} onValueChange={(v) => setForm({ ...form, subject: v })}>
-              <SelectTrigger className="h-11 rounded-xl bg-background/50"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {subjectOptions.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select value={form.subject} onValueChange={(v) => setForm({ ...form, subject: v })}>
+                <SelectTrigger className="h-11 rounded-xl bg-background/50"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {subjectOptions.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <AddTaxonomyDialog
+                title="إضافة مادة جديدة"
+                onAdd={(ar, en, fr) => {
+                  const ok = settings.addSubject(ar, ar, en, fr);
+                  if (ok) {
+                    const key = ar.trim().toLowerCase().replace(/\s+/g, "_");
+                    setForm((f) => ({ ...f, subject: key }));
+                    toast.success("تمت الإضافة");
+                  } else toast.error("الاسم مستخدم");
+                }}
+              />
+            </div>
           </Field>
 
           <Field label={t("admin.form.country")}>
-            <Select value={form.country} onValueChange={(v) => setForm({ ...form, country: v })}>
-              <SelectTrigger className="h-11 rounded-xl bg-background/50"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {countryOptions.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select value={form.country} onValueChange={(v) => setForm({ ...form, country: v })}>
+                <SelectTrigger className="h-11 rounded-xl bg-background/50"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {countryOptions.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <AddTaxonomyDialog
+                title="إضافة دولة جديدة"
+                codeField
+                onAdd={(ar, en, fr, code) => {
+                  const c = (code || ar).toUpperCase();
+                  const ok = settings.addCountry(c, ar, en, fr);
+                  if (ok) {
+                    setForm((f) => ({ ...f, country: c }));
+                    toast.success("تمت الإضافة");
+                  } else toast.error("موجودة");
+                }}
+              />
+            </div>
           </Field>
 
           <Field label={t("admin.form.stage")}>
-            <Select value={form.stage} onValueChange={(v) => setForm({ ...form, stage: v })}>
-              <SelectTrigger className="h-11 rounded-xl bg-background/50"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {stageOptions.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select value={form.stage} onValueChange={(v) => setForm({ ...form, stage: v })}>
+                <SelectTrigger className="h-11 rounded-xl bg-background/50"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {stageOptions.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <AddTaxonomyDialog
+                title="إضافة مرحلة جديدة"
+                onAdd={(ar, en, fr) => {
+                  const ok = settings.addStage(ar, ar, en, fr);
+                  if (ok) {
+                    const key = ar.trim().toLowerCase().replace(/\s+/g, "_");
+                    setForm((f) => ({ ...f, stage: key }));
+                    toast.success("تمت الإضافة");
+                  } else toast.error("موجودة");
+                }}
+              />
+            </div>
           </Field>
 
           <Field label={t("admin.form.price")}>
@@ -228,5 +269,68 @@ function Field({ label, children, className = "" }: { label: string; children: R
       <Label className="mb-2 block text-xs uppercase tracking-wider text-muted-foreground">{label}</Label>
       {children}
     </div>
+  );
+}
+
+function AddTaxonomyDialog({
+  title,
+  onAdd,
+  codeField = false,
+}: {
+  title: string;
+  codeField?: boolean;
+  onAdd: (ar: string, en: string, fr: string, code?: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [ar, setAr] = useState("");
+  const [en, setEn] = useState("");
+  const [fr, setFr] = useState("");
+  const [code, setCode] = useState("");
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button type="button" variant="outline" size="icon" className="h-11 w-11 rounded-xl shrink-0" title={title}>
+          <PlusCircle className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+        <div className="grid gap-3">
+          {codeField && (
+            <div>
+              <Label>الرمز (مثال: SA)</Label>
+              <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={5} />
+            </div>
+          )}
+          <div>
+            <Label>الاسم بالعربية *</Label>
+            <Input value={ar} onChange={(e) => setAr(e.target.value)} required />
+          </div>
+          <div>
+            <Label>الاسم بالإنجليزية</Label>
+            <Input value={en} onChange={(e) => setEn(e.target.value)} />
+          </div>
+          <div>
+            <Label>الاسم بالفرنسية</Label>
+            <Input value={fr} onChange={(e) => setFr(e.target.value)} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setOpen(false)}>إلغاء</Button>
+          <Button
+            type="button"
+            onClick={() => {
+              if (!ar.trim()) return;
+              onAdd(ar.trim(), en.trim(), fr.trim(), code.trim() || undefined);
+              setAr(""); setEn(""); setFr(""); setCode("");
+              setOpen(false);
+            }}
+            className="bg-gradient-neon text-white"
+          >
+            إضافة
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

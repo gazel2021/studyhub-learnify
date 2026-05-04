@@ -13,7 +13,7 @@ export const Route = createFileRoute("/reader/$id")({
   component: ReaderPage,
 });
 
-const PREVIEW_PCT = 20;
+const PREVIEW_PAGES = 2;
 
 function ReaderPage() {
   const t = useT();
@@ -39,7 +39,7 @@ function ReaderPage() {
     return raw;
   }, [product.content]);
 
-  const previewCount = Math.max(1, Math.ceil((paragraphs.length * PREVIEW_PCT) / 100));
+  const previewCount = Math.min(PREVIEW_PAGES, paragraphs.length);
   const visible = owned ? paragraphs : paragraphs.slice(0, previewCount);
 
   return (
@@ -77,7 +77,7 @@ function ReaderPage() {
         {!owned && (
           <div className="mt-5 mb-6 rounded-2xl glass border border-amber-400/30 p-3 text-sm flex items-center gap-2 text-amber-300">
             <Sparkles className="h-4 w-4" />
-            {t("reader.preview.label", { pct: PREVIEW_PCT })}
+            {`معاينة ${PREVIEW_PAGES} صفحات فقط — اشترِ المنتج أو انتظر موافقة الإدارة لقراءة الباقي`}
           </div>
         )}
 
