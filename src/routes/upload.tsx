@@ -271,3 +271,66 @@ function Field({ label, children, className = "" }: { label: string; children: R
     </div>
   );
 }
+
+function AddTaxonomyDialog({
+  title,
+  onAdd,
+  codeField = false,
+}: {
+  title: string;
+  codeField?: boolean;
+  onAdd: (ar: string, en: string, fr: string, code?: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [ar, setAr] = useState("");
+  const [en, setEn] = useState("");
+  const [fr, setFr] = useState("");
+  const [code, setCode] = useState("");
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button type="button" variant="outline" size="icon" className="h-11 w-11 rounded-xl shrink-0" title={title}>
+          <PlusCircle className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+        <div className="grid gap-3">
+          {codeField && (
+            <div>
+              <Label>الرمز (مثال: SA)</Label>
+              <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={5} />
+            </div>
+          )}
+          <div>
+            <Label>الاسم بالعربية *</Label>
+            <Input value={ar} onChange={(e) => setAr(e.target.value)} required />
+          </div>
+          <div>
+            <Label>الاسم بالإنجليزية</Label>
+            <Input value={en} onChange={(e) => setEn(e.target.value)} />
+          </div>
+          <div>
+            <Label>الاسم بالفرنسية</Label>
+            <Input value={fr} onChange={(e) => setFr(e.target.value)} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setOpen(false)}>إلغاء</Button>
+          <Button
+            type="button"
+            onClick={() => {
+              if (!ar.trim()) return;
+              onAdd(ar.trim(), en.trim(), fr.trim(), code.trim() || undefined);
+              setAr(""); setEn(""); setFr(""); setCode("");
+              setOpen(false);
+            }}
+            className="bg-gradient-neon text-white"
+          >
+            إضافة
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
