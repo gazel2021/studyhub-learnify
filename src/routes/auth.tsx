@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, BookOpen, Shield, Mail, Lock, User, Sparkles, KeyRound, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,24 @@ function AuthPage() {
   const [pw, setPw] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      const cloudUser = data.session?.user;
+      if (!cloudUser?.email) return;
+      const pending = readPendingSignup(cloudUser.email);
+      const meta = cloudUser.user_metadata as { name?: string; role?: Role };
+      const account = upsertVerifiedUser({
+        id: cloudUser.id,
+        name: pending?.name || meta.name || cloudUser.email.split("@")[0],
+        email: cloudUser.email,
+        password: pending?.password,
+        role: pending?.role || meta.role || "student",
+      });
+      clearPendingSignup(cloudUser.email);
+      login({ id: account.id, name: account.name, email: account.email, role: account.role });
+    });
+  }, [login, upsertVerifiedUser]);
 
   const ROLES: { id: Role; title: string; desc: string; icon: typeof BookOpen }[] = [
     { id: "student", title: t("auth.role.student.t"), desc: t("auth.role.student.d"), icon: BookOpen },
@@ -77,6 +95,8 @@ function AuthPage() {
       setStep("otp");
       return toast.success(t("auth.otp.sent", { code: fallback.code }), { duration: 10_000 });
     }
+    savePendingSignup(email, { name, password: pw, role });
+    setStep("otp");
     toast.success(t("auth.email.sent"));
   };
 
@@ -121,8 +141,31 @@ function AuthPage() {
     setStep("form");
   };
 
-  const handleVerify = (e: React.FormEvent) => {
+  const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBusy(true);
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token: otpCode,
+      type: "signup",
+    });
+    setBusy(false);
+    if (!error && data.user?.email) {
+      const pending = readPendingSignup(data.user.email);
+      const meta = data.user.user_metadata as { name?: string; role?: Role };
+      const account = upsertVerifiedUser({
+        id: data.user.id,
+        name: pending?.name || meta.name || data.user.email.split("@")[0],
+        email: data.user.email,
+        password: pending?.password,
+        role: pending?.role || meta.role || "student",
+      });
+      clearPendingSignup(data.user.email);
+      login({ id: account.id, name: account.name, email: account.email, role: account.role });
+      toast.success(`${t("auth.welcome")}، ${account.name}`);
+      navigate({ to: account.role === "admin" ? "/admin" : "/dashboard" });
+      return;
+    }
     const r = verifyOtp(email, otpCode);
     if (r.error || !r.user) return toast.error(errMsg(r.error));
     login({ id: r.user.id, name: r.user.name, email: r.user.email, role: r.user.role });
@@ -130,7 +173,13 @@ function AuthPage() {
     navigate({ to: r.user.role === "admin" ? "/admin" : "/dashboard" });
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth` },
+    });
+    if (!error) return toast.success(t("auth.email.sent"));
     const r = resendOtp(email);
     if (r.error) return toast.error(errMsg(r.error));
     toast.success(t("auth.otp.resent", { code: r.code }), { duration: 10_000 });
