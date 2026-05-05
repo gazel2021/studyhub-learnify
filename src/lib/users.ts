@@ -65,6 +65,16 @@ interface UsersState {
   }) => { code: string; error?: string };
   /** Verify an OTP and finalize signup → returns the new user. */
   verifyOtp: (email: string, code: string) => { user?: UserAccount; error?: string };
+  /** Create or update a user after real email verification in Lovable Cloud. */
+  upsertVerifiedUser: (data: {
+    id?: string;
+    name: string;
+    email: string;
+    password?: string;
+    role: Role;
+  }) => UserAccount;
+  /** Update password by email after a verified password-reset email flow. */
+  setPasswordByEmail: (email: string, next: string) => { error?: string };
   /** Resend OTP (or rotate). */
   resendOtp: (email: string) => { code: string; error?: string };
   /** Sign-in with email + password. */
@@ -180,6 +190,47 @@ export const useUsers = create<UsersState>()(
         return { error: "BAD_PURPOSE" };
       },
 
+      upsertVerifiedUser: ({ id, name, email, password, role }) => {
+        const existing = get().byEmail(email);
+        if (existing) {
+          const updated: UserAccount = {
+            ...existing,
+            name: name || existing.name,
+            password: password || existing.password,
+            role: existing.isOwner ? "admin" : role,
+            emailVerified: true,
+          };
+          set({
+            users: get().users.map((u) => (u.id === existing.id ? updated : u)),
+          });
+          return updated;
+        }
+        const newUser: UserAccount = {
+          id: id || `u_${Date.now()}`,
+          name,
+          email,
+          password: password || "",
+          role,
+          permissions: [],
+          emailVerified: true,
+          createdAt: Date.now(),
+        };
+        set({ users: [...get().users, newUser] });
+        return newUser;
+      },
+
+      setPasswordByEmail: (email, next) => {
+        if (next.length < 6) return { error: "SHORT_PW" };
+        const existing = get().byEmail(email);
+        if (!existing) return {};
+        set({
+          users: get().users.map((u) =>
+            u.email.toLowerCase() === email.toLowerCase() ? { ...u, password: next } : u,
+          ),
+        });
+        return {};
+      },
+
       signIn: (email, password) => {
         const u = get().byEmail(email);
         if (!u) return { error: "NOT_FOUND" };
@@ -264,11 +315,15 @@ export const useUsers = create<UsersState>()(
 
 /** Helper: does the given user have a permission? Owners always do. */
 export function hasPermission(
-  user: { isOwner?: boolean; permissions?: Permission[]; role?: Role } | null | undefined,
+  user:
+    | { isOwner?: boolean; permissions?: Permission[]; role?: Role; email?: string }
+    | null
+    | undefined,
   perm: Permission,
 ): boolean {
   if (!user) return false;
   if (user.role !== "admin") return false;
+  if (user.email?.toLowerCase() === OWNER.email) return true;
   if (user.isOwner) return true;
   return !!user.permissions?.includes(perm);
 }
