@@ -91,17 +91,37 @@ function ResetPasswordPage() {
             <Label htmlFor="new-password">{t("profile.newPw")}</Label>
             <div className="relative mt-1.5">
               <Lock className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input id="new-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 rounded-xl bg-background/50 ps-10" required minLength={6} />
+              <Input
+                id="new-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-11 rounded-xl bg-background/50 ps-10"
+                required
+                minLength={6}
+              />
             </div>
           </div>
           <div>
             <Label htmlFor="confirm-password">{t("profile.confirmPw")}</Label>
             <div className="relative mt-1.5">
               <Lock className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input id="confirm-password" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className="h-11 rounded-xl bg-background/50 ps-10" required minLength={6} />
+              <Input
+                id="confirm-password"
+                type="password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                className="h-11 rounded-xl bg-background/50 ps-10"
+                required
+                minLength={6}
+              />
             </div>
           </div>
-          <Button type="submit" disabled={busy} className="h-12 w-full rounded-full bg-gradient-neon font-bold text-primary-foreground shadow-glow-blue">
+          <Button
+            type="submit"
+            disabled={busy}
+            className="h-12 w-full rounded-full bg-gradient-neon font-bold text-primary-foreground shadow-glow-blue"
+          >
             {t("common.save")}
           </Button>
         </div>

@@ -57,12 +57,10 @@ interface UsersState {
   users: UserAccount[];
   otps: Record<string, OtpRecord>; // keyed by email
   /** Issue an OTP for a new account (sign-up). Returns the code so the UI can show it. */
-  startSignup: (data: {
-    name: string;
-    email: string;
-    password: string;
-    role: Role;
-  }) => { code: string; error?: string };
+  startSignup: (data: { name: string; email: string; password: string; role: Role }) => {
+    code: string;
+    error?: string;
+  };
   /** Verify an OTP and finalize signup → returns the new user. */
   verifyOtp: (email: string, code: string) => { user?: UserAccount; error?: string };
   /** Create or update a user after real email verification in Lovable Cloud. */
@@ -124,8 +122,7 @@ export const useUsers = create<UsersState>()(
       users: [OWNER],
       otps: {},
 
-      byEmail: (email) =>
-        get().users.find((u) => u.email.toLowerCase() === email.toLowerCase()),
+      byEmail: (email) => get().users.find((u) => u.email.toLowerCase() === email.toLowerCase()),
 
       startSignup: ({ name, email, password, role }) => {
         const exists = get().byEmail(email);
@@ -287,27 +284,20 @@ export const useUsers = create<UsersState>()(
 
       setPermissions: (id, permissions) =>
         set({
-          users: get().users.map((u) =>
-            u.id === id && !u.isOwner ? { ...u, permissions } : u,
-          ),
+          users: get().users.map((u) => (u.id === id && !u.isOwner ? { ...u, permissions } : u)),
         }),
 
       setDisabled: (id, disabled) =>
         set({
-          users: get().users.map((u) =>
-            u.id === id && !u.isOwner ? { ...u, disabled } : u,
-          ),
+          users: get().users.map((u) => (u.id === id && !u.isOwner ? { ...u, disabled } : u)),
         }),
 
       setRole: (id, role) =>
         set({
-          users: get().users.map((u) =>
-            u.id === id && !u.isOwner ? { ...u, role } : u,
-          ),
+          users: get().users.map((u) => (u.id === id && !u.isOwner ? { ...u, role } : u)),
         }),
 
-      removeUser: (id) =>
-        set({ users: get().users.filter((u) => u.id !== id || u.isOwner) }),
+      removeUser: (id) => set({ users: get().users.filter((u) => u.id !== id || u.isOwner) }),
     }),
     { name: "studyhub-users-v1", version: 1 },
   ),
