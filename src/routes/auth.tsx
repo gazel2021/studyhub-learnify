@@ -270,6 +270,29 @@ function AuthPage() {
               </motion.form>
             )}
 
+            {mode === "forgot" && (
+              <motion.form
+                key="forgot"
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+                onSubmit={handleForgotSubmit}
+                className="space-y-4"
+              >
+                <div>
+                  <Label htmlFor="forgot-email">{t("auth.email")}</Label>
+                  <div className="relative mt-1.5">
+                    <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input id="forgot-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="ps-10 h-11 rounded-xl bg-background/50" placeholder="you@example.com" required />
+                  </div>
+                </div>
+                <Button type="submit" disabled={busy} className="w-full h-12 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue">
+                  {t("auth.forgot.send")}
+                </Button>
+                <Button type="button" variant="ghost" className="w-full" onClick={() => { setMode("login"); setStep("form"); }}>
+                  <ArrowLeft className="h-3.5 w-3.5 me-1" /> {t("auth.back")}
+                </Button>
+              </motion.form>
+            )}
+
             {/* OTP step */}
             {step === "otp" && (
               <motion.form
@@ -308,7 +331,7 @@ function AuthPage() {
             )}
           </AnimatePresence>
 
-          {step !== "otp" && (
+          {step !== "otp" && mode !== "forgot" && (
             <div className="mt-6 text-center text-sm text-muted-foreground">
               {mode === "signup" ? t("auth.haveAccount") : t("auth.noAccount")}{" "}
               <button
