@@ -1268,13 +1268,13 @@ export const useI18n = create<I18nState>((set) => ({
     if (typeof document !== "undefined") {
       document.documentElement.lang = l;
       document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
-      localStorage.setItem("lang", l);
+      localStorage.setItem("studyhub-lang-v2", l);
     }
     set({ lang: l });
   },
   init: () => {
     if (typeof window === "undefined") return;
-    const saved = (localStorage.getItem("lang") as Lang | null) ?? "ar";
+    const saved = (localStorage.getItem("studyhub-lang-v2") as Lang | null) ?? "ar";
     document.documentElement.lang = saved;
     document.documentElement.dir = saved === "ar" ? "rtl" : "ltr";
     set({ lang: saved });
