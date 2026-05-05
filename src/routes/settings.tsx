@@ -26,12 +26,13 @@ function SettingsPage() {
   const s = useSettings();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const canSettings = hasPermission(account, "manage_settings");
-  const canPages = hasPermission(account, "edit_pages");
-  const canTax = hasPermission(account, "manage_taxonomy");
-  const canUsers = hasPermission(account, "manage_users");
+  const cloudAdmin = sessionUser?.role === "admin" && !account;
+  const canSettings = cloudAdmin || hasPermission(account, "manage_settings");
+  const canPages = cloudAdmin || hasPermission(account, "edit_pages");
+  const canTax = cloudAdmin || hasPermission(account, "manage_taxonomy");
+  const canUsers = cloudAdmin || hasPermission(account, "manage_users");
 
-  if (!sessionUser || !account || account.role !== "admin") {
+  if (!sessionUser || sessionUser.role !== "admin") {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <Shield className="h-16 w-16 mx-auto mb-4 text-rose-400" />
