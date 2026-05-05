@@ -157,6 +157,8 @@ function AuthPage() {
           <h1 className="text-3xl md:text-4xl font-bold font-display">
             {step === "otp"
               ? t("auth.otp.title")
+              : mode === "forgot"
+              ? t("auth.forgot.title")
               : mode === "signup"
               ? t("auth.signup.title")
               : t("auth.signin.title")}
@@ -164,6 +166,8 @@ function AuthPage() {
           <p className="mt-2 text-muted-foreground text-sm">
             {step === "otp"
               ? t("auth.otp.subtitle", { email })
+              : mode === "forgot"
+              ? t("auth.forgot.subtitle")
               : mode === "signup"
               ? t("auth.signup.subtitle")
               : t("auth.signin.subtitle")}
@@ -209,7 +213,7 @@ function AuthPage() {
             )}
 
             {/* SIGN-UP STEP 2 / LOGIN: form */}
-            {step === "form" && (
+            {step === "form" && mode !== "forgot" && (
               <motion.form
                 key="form"
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
@@ -239,9 +243,18 @@ function AuthPage() {
                     <Input id="pw" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} value={pw} onChange={(e) => setPw(e.target.value)} className="ps-10 h-11 rounded-xl bg-background/50" placeholder="••••••••" required />
                   </div>
                 </div>
-                <Button type="submit" className="w-full h-12 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple transition-smooth">
+                <Button type="submit" disabled={busy} className="w-full h-12 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple transition-smooth">
                   {mode === "signup" ? t("auth.create") : t("auth.signin")}
                 </Button>
+                {mode === "login" && (
+                  <button
+                    type="button"
+                    onClick={() => setMode("forgot")}
+                    className="block w-full text-center text-sm font-semibold text-gradient-neon hover:opacity-80"
+                  >
+                    {t("auth.forgot.link")}
+                  </button>
+                )}
                 {mode === "signup" && (
                   <Button type="button" variant="ghost" className="w-full" onClick={() => setStep("role")}>
                     {t("auth.changeRole")}
