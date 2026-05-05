@@ -234,7 +234,8 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     // Upload (teachers/students)
     "upload.title": "أضف محتوى تعليمي",
     "upload.subtitle": "شارك معرفتك مع المجتمع — سيخضع المحتوى لمراجعة الإدارة قبل النشر.",
-    "upload.guideline": "بعد إرسال المحتوى، سيتم مراجعته من قبل فريق الإدارة. ستحصل على إشعار عند الموافقة أو الرفض.",
+    "upload.guideline":
+      "بعد إرسال المحتوى، سيتم مراجعته من قبل فريق الإدارة. ستحصل على إشعار عند الموافقة أو الرفض.",
 
     // Status badges
     "status.pending": "قيد المراجعة",
@@ -318,7 +319,7 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "country.GLOBAL": "عالمي",
 
     // Types
-     "type.book": "كتاب",
+    "type.book": "كتاب",
     "type.exam": "امتحان",
     "type.quiz": "اختبار",
 
@@ -456,7 +457,8 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "hero.title.2": "with",
     "hero.title.3": "neon-fast",
     "hero.title.4": "AI content.",
-    "hero.subtitle": "Discover thousands of curated PDFs, mock exams and interactive quizzes — sorted by country, stage and subject.",
+    "hero.subtitle":
+      "Discover thousands of curated PDFs, mock exams and interactive quizzes — sorted by country, stage and subject.",
     "hero.cta.start": "Start exploring",
     "hero.cta.teacher": "Become a teacher",
     "hero.stat.resources": "Resources",
@@ -653,8 +655,10 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "admin.tab.all": "All",
 
     "upload.title": "Add educational content",
-    "upload.subtitle": "Share your knowledge — content will be reviewed by admins before going live.",
-    "upload.guideline": "After submission, admins will review your content. You'll get notified upon approval or rejection.",
+    "upload.subtitle":
+      "Share your knowledge — content will be reviewed by admins before going live.",
+    "upload.guideline":
+      "After submission, admins will review your content. You'll get notified upon approval or rejection.",
 
     "status.pending": "Pending",
     "status.approved": "Approved",
@@ -686,7 +690,8 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "common.added": "Added to cart",
     "common.startedDownload": "Download started!",
 
-    "footer.tagline": "The AI-powered marketplace for premium learning content — built for the next generation.",
+    "footer.tagline":
+      "The AI-powered marketplace for premium learning content — built for the next generation.",
     "footer.platform": "Platform",
     "footer.company": "Company",
     "footer.connect": "Connect",
@@ -730,7 +735,7 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "country.SD": "Sudan",
     "country.GLOBAL": "Global",
 
-     "type.book": "Book",
+    "type.book": "Book",
     "type.exam": "Exam",
     "type.quiz": "Quiz",
 
@@ -861,7 +866,8 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "hero.title.2": "avec du",
     "hero.title.3": "contenu néon",
     "hero.title.4": "boosté par l'IA.",
-    "hero.subtitle": "Découvrez des milliers de PDF, examens et quiz interactifs — triés par pays, niveau et matière.",
+    "hero.subtitle":
+      "Découvrez des milliers de PDF, examens et quiz interactifs — triés par pays, niveau et matière.",
     "hero.cta.start": "Commencer",
     "hero.cta.teacher": "Devenir enseignant",
     "hero.stat.resources": "Ressources",
@@ -1135,7 +1141,7 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "country.SD": "Soudan",
     "country.GLOBAL": "Global",
 
-     "type.book": "Livre",
+    "type.book": "Livre",
     "type.exam": "Examen",
     "type.quiz": "Quiz",
 
@@ -1284,12 +1290,14 @@ function readCustomLabel(key: string, lang: Lang): string | null {
     const parsed = JSON.parse(raw);
     const s = parsed?.state ?? parsed;
     const lookup = (
-      list: { key?: string; code?: string; label: { ar: string; en: string; fr: string } }[] | undefined,
+      list:
+        | { key?: string; code?: string; label: { ar: string; en: string; fr: string } }[]
+        | undefined,
       keyOrCode: string,
     ) => {
       if (!list) return null;
       const found = list.find((x) => x.key === keyOrCode || x.code === keyOrCode);
-      return found ? (found.label[lang] || found.label.en) : null;
+      return found ? found.label[lang] || found.label.en : null;
     };
     if (key.startsWith("subject.")) return lookup(s.customSubjects, key.slice(8));
     if (key.startsWith("country.")) return lookup(s.customCountries, key.slice(8));
