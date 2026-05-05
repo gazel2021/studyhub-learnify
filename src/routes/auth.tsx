@@ -17,6 +17,33 @@ export const Route = createFileRoute("/auth")({
 
 type Step = "role" | "form" | "otp";
 
+type PendingSignup = { name: string; password: string; role: Role };
+
+function pendingKey(email: string) {
+  return `studyhub-pending-signup:${email.toLowerCase()}`;
+}
+
+function readPendingSignup(email: string): PendingSignup | null {
+  if (typeof window === "undefined") return null;
+  const raw = localStorage.getItem(pendingKey(email));
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as PendingSignup;
+  } catch {
+    return null;
+  }
+}
+
+function savePendingSignup(email: string, data: PendingSignup) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(pendingKey(email), JSON.stringify(data));
+}
+
+function clearPendingSignup(email: string) {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(pendingKey(email));
+}
+
 function AuthPage() {
   const t = useT();
   const navigate = useNavigate();
