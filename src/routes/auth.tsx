@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth, type Role } from "@/lib/store";
 import { useUsers } from "@/lib/users";
 import { useT } from "@/lib/i18n";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
@@ -24,14 +25,16 @@ function AuthPage() {
   const verifyOtp = useUsers((s) => s.verifyOtp);
   const resendOtp = useUsers((s) => s.resendOtp);
   const signIn = useUsers((s) => s.signIn);
+  const upsertVerifiedUser = useUsers((s) => s.upsertVerifiedUser);
 
-  const [mode, setMode] = useState<"signup" | "login">("signup");
+  const [mode, setMode] = useState<"signup" | "login" | "forgot">("signup");
   const [step, setStep] = useState<Step>("role");
   const [role, setRole] = useState<Role>("student");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [otpCode, setOtpCode] = useState("");
+  const [busy, setBusy] = useState(false);
 
   const ROLES: { id: Role; title: string; desc: string; icon: typeof BookOpen }[] = [
     { id: "student", title: t("auth.role.student.t"), desc: t("auth.role.student.d"), icon: BookOpen },
@@ -55,23 +58,67 @@ function AuthPage() {
     return e ? map[e] ?? e : "";
   };
 
-  const handleSignupSubmit = (e: React.FormEvent) => {
+  const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !pw) return toast.error(t("auth.fillAll"));
-    const r = startSignup({ name, email, password: pw, role });
-    if (r.error) return toast.error(errMsg(r.error));
-    setStep("otp");
-    toast.success(t("auth.otp.sent", { code: r.code }), { duration: 10_000 });
+    setBusy(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: pw,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth`,
+        data: { name, role },
+      },
+    });
+    setBusy(false);
+    if (error) {
+      const fallback = startSignup({ name, email, password: pw, role });
+      if (fallback.error) return toast.error(error.message || errMsg(fallback.error));
+      setStep("otp");
+      return toast.success(t("auth.otp.sent", { code: fallback.code }), { duration: 10_000 });
+    }
+    toast.success(t("auth.email.sent"));
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !pw) return toast.error(t("auth.fillAll"));
+    setBusy(true);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    setBusy(false);
+    if (!error && data.user) {
+      const meta = data.user.user_metadata as { name?: string; role?: Role };
+      const account = upsertVerifiedUser({
+        id: data.user.id,
+        name: meta.name || data.user.email?.split("@")[0] || "User",
+        email: data.user.email || email,
+        password: pw,
+        role: meta.role || "student",
+      });
+      login({ id: account.id, name: account.name, email: account.email, role: account.role });
+      toast.success(`${t("auth.welcome")}، ${account.name}`);
+      navigate({ to: account.role === "admin" ? "/admin" : "/dashboard" });
+      return;
+    }
     const r = signIn(email, pw);
     if (r.error || !r.user) return toast.error(errMsg(r.error));
     login({ id: r.user.id, name: r.user.name, email: r.user.email, role: r.user.role });
     toast.success(`${t("auth.welcome")}، ${r.user.name}`);
     navigate({ to: r.user.role === "admin" ? "/admin" : "/dashboard" });
+  };
+
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return toast.error(t("auth.error.badEmail"));
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(t("auth.forgot.sent"));
+    setMode("login");
+    setStep("form");
   };
 
   const handleVerify = (e: React.FormEvent) => {
