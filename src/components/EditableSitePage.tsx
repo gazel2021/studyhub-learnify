@@ -19,7 +19,8 @@ export function EditableSitePage({ slug }: { slug: EditablePageSlug }) {
   );
   const body = useSettings((s) => s.pages[slug].body);
   const setPage = useSettings((s) => s.setPage);
-  const canEdit = hasPermission(account, "edit_pages");
+  const canEdit =
+    sessionUser?.role === "admin" && (!account || hasPermission(account, "edit_pages"));
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(body);
 
