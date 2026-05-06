@@ -16,6 +16,11 @@ const RAW_FILES = import.meta.glob("/src/**/*.{ts,tsx,css,json,js,md}", {
   import: "default",
   eager: true,
 }) as Record<string, string>;
+// Exclude auto-generated / integration files that aren't useful to view.
+const EXCLUDED = /\/(routeTree\.gen\.ts|integrations\/supabase\/types\.ts)$/;
+for (const k of Object.keys(RAW_FILES)) {
+  if (EXCLUDED.test(k)) delete RAW_FILES[k];
+}
 
 export const Route = createFileRoute("/code")({
   component: CodeViewerPage,
