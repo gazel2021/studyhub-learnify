@@ -14,7 +14,7 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
-type Method = "pi" | "card" | "local";
+type Method = "pi" | "card" | "paypal";
 
 function CheckoutPage() {
   const t = useT();
@@ -100,7 +100,7 @@ function CheckoutPage() {
   const METHODS: { id: Method; name: string; desc: string; icon: typeof CreditCard }[] = [
     { id: "pi", name: t("checkout.method.pi.name"), desc: t("checkout.method.pi.desc"), icon: PiIcon as never },
     { id: "card", name: t("checkout.method.card.name"), desc: t("checkout.method.card.desc"), icon: CreditCard },
-    { id: "local", name: t("checkout.method.local.name"), desc: t("checkout.method.local.desc"), icon: Wallet },
+    { id: "paypal", name: "PayPal", desc: "Pay securely with your PayPal account", icon: Wallet },
   ];
 
   const displayPrice = formatCurrency(totalUsd, currencyCode, lang);

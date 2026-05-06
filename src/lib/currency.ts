@@ -76,7 +76,8 @@ export function convertFromUsd(usd: number, code: string): number {
 export function formatCurrency(usd: number, code: string, lang: "ar" | "en" | "fr" = "ar"): string {
   const c = CURRENCIES[code] || CURRENCIES.USD;
   const value = convertFromUsd(usd, code);
-  const formatted = new Intl.NumberFormat(lang === "ar" ? "ar-EG" : lang === "fr" ? "fr-FR" : "en-US", {
+  // Always use Latin digits (French formatting) per user request
+  const formatted = new Intl.NumberFormat("fr-FR", {
     maximumFractionDigits: value >= 1000 ? 0 : 2,
   }).format(value);
   if (code === "USD") return `$${formatted}`;
