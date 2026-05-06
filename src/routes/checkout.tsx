@@ -14,7 +14,7 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
-type Method = "pi" | "card" | "local";
+type Method = "pi" | "card" | "paypal";
 
 function CheckoutPage() {
   const t = useT();
