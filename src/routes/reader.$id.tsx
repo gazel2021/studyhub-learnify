@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, Lock, Sparkles, ShoppingCart } from "lucide-react";
@@ -21,7 +21,9 @@ function ReaderPage() {
   const { id } = Route.useParams();
   const product = useProducts((s) => s.items.find((p) => p.id === id));
   const purchased = useCart((s) => s.purchased);
+  const items = useCart((s) => s.items);
   const add = useCart((s) => s.add);
+  const navigate = useNavigate();
 
   if (!product) throw notFound();
 
@@ -121,7 +123,10 @@ function ReaderPage() {
               <p className="mt-2 text-sm text-muted-foreground">{t("reader.locked.d")}</p>
               <div className="mt-5 flex flex-col gap-2">
                 <Button
-                  onClick={() => add(product)}
+                  onClick={() => {
+                    if (!items.find((i) => i.id === product.id)) add(product);
+                    navigate({ to: "/checkout" });
+                  }}
                   className="h-12 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple hover:scale-105 transition-smooth"
                 >
                   <ShoppingCart className="h-4 w-4 me-2" />
