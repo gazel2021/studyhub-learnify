@@ -16,6 +16,7 @@ const RAW_FILES = import.meta.glob(
     "/src/**/*.{ts,tsx,css,json,js,md}",
     "!/src/routeTree.gen.ts",
     "!/src/integrations/supabase/types.ts",
+    "!/src/**/*.server.*",
   ],
   { query: "?raw", import: "default", eager: true },
 ) as Record<string, string>;
