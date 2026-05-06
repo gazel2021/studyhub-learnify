@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, Lock, Sparkles, ShoppingCart } from "lucide-react";
