@@ -21,7 +21,9 @@ function ReaderPage() {
   const { id } = Route.useParams();
   const product = useProducts((s) => s.items.find((p) => p.id === id));
   const purchased = useCart((s) => s.purchased);
+  const items = useCart((s) => s.items);
   const add = useCart((s) => s.add);
+  const navigate = useNavigate();
 
   if (!product) throw notFound();
 
