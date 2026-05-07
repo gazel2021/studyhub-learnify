@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal, Plus, Filter } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
@@ -27,6 +27,7 @@ const TYPES = ["book", "exam", "quiz"] as const;
 
 function ProductsPage() {
   const t = useT();
+  const pathname = useLocation({ select: (location) => location.pathname });
   const user = useAuth((s) => s.user);
   const all = useProducts((s) => s.items);
   const PRODUCTS = selectApproved(all);
@@ -62,6 +63,8 @@ function ProductsPage() {
   }, [q, subject, country, stage, type, sort, PRODUCTS]);
 
   const updateSearch = (patch: Partial<SearchT>) => navigate({ search: { ...search, ...patch } });
+
+  if (pathname !== "/products") return <Outlet />;
 
   return (
     <div className="mx-auto max-w-7xl px-4 md:px-6 py-10">
