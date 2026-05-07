@@ -181,7 +181,7 @@ function ProductDetail() {
                       size="lg"
                       className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple hover:scale-105 transition-smooth"
                     >
-                      <ShoppingCart className="me-2 h-5 w-5" /> {t("detail.addCart")}
+                      <ShoppingCart className="me-2 h-5 w-5" /> {t("detail.buyNow")}
                     </Button>
                   )}
                   <Button
