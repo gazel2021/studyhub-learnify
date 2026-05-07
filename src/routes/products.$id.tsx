@@ -42,9 +42,12 @@ function ProductDetail() {
   const owned = product.price === 0 || purchased.includes(product.id);
   const currency = currencyForCountry(product.country);
 
-  const handleAddCart = () => {
-    add(product);
-    toast.success(t("common.added"));
+  const handleBuyNow = () => {
+    if (!items.some((i) => i.id === product.id)) {
+      add(product);
+      toast.success(t("common.added"));
+    }
+    navigate({ to: "/checkout" });
   };
 
   const related = selectApproved(all)
@@ -124,20 +127,24 @@ function ProductDetail() {
               ) : (
                 <>
                   {inCart ? (
-                    <Button onClick={() => navigate({ to: "/cart" })} size="lg" className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue">
-                      {t("detail.goCart")} →
+                    <Button onClick={handleBuyNow} size="lg" className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue">
+                      {t("checkout.payNow")} →
                     </Button>
                   ) : (
-                    <Button onClick={handleAddCart} size="lg" className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple hover:scale-105 transition-smooth">
+                    <Button onClick={handleBuyNow} size="lg" className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple hover:scale-105 transition-smooth">
                       <ShoppingCart className="me-2 h-5 w-5" /> {t("detail.addCart")}
                     </Button>
                   )}
-                  <Link to="/reader/$id" params={{ id: product.id }}>
-                    <Button variant="outline" size="lg" className="w-full h-12 rounded-full glass border-white/20 hover:bg-white/5">
-                      <Eye className="me-2 h-4 w-4" /> {t("detail.preview")}
-                      <Lock className="ms-2 h-3.5 w-3.5 opacity-60" />
-                    </Button>
-                  </Link>
+                  <Button
+                    type="button"
+                    onClick={() => navigate({ to: "/reader/$id", params: { id: product.id } })}
+                    variant="outline"
+                    size="lg"
+                    className="w-full h-12 rounded-full glass border-white/20 hover:bg-white/5"
+                  >
+                    <Eye className="me-2 h-4 w-4" /> {t("detail.preview")}
+                    <Lock className="ms-2 h-3.5 w-3.5 opacity-60" />
+                  </Button>
                 </>
               )}
 
