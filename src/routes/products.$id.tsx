@@ -1,5 +1,17 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { Star, BookOpen, ShoppingCart, Check, ArrowLeft, FileText, Globe, GraduationCap, Lock, Eye, Clock } from "lucide-react";
+import {
+  Star,
+  BookOpen,
+  ShoppingCart,
+  Check,
+  ArrowLeft,
+  FileText,
+  Globe,
+  GraduationCap,
+  Lock,
+  Eye,
+  Clock,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useProducts, selectApproved } from "@/lib/products";
 import { useCart, useAuth } from "@/lib/store";
@@ -32,7 +44,9 @@ function ProductDetail() {
         <h1 className="text-2xl font-bold font-display">{t("detail.pending.t")}</h1>
         <p className="text-muted-foreground mt-2">{t("detail.pending.d")}</p>
         <Link to="/products">
-          <Button className="mt-6 h-12 px-6 rounded-full bg-gradient-neon text-white">{t("detail.back")}</Button>
+          <Button className="mt-6 h-12 px-6 rounded-full bg-gradient-neon text-white">
+            {t("detail.back")}
+          </Button>
         </Link>
       </div>
     );
@@ -56,7 +70,10 @@ function ProductDetail() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 md:px-6 py-10">
-      <Link to="/products" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-gradient-neon transition-smooth mb-6">
+      <Link
+        to="/products"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-gradient-neon transition-smooth mb-6"
+      >
         <ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {t("detail.back")}
       </Link>
 
@@ -80,39 +97,60 @@ function ProductDetail() {
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3 flex-wrap">
             <span className="px-2.5 py-1 rounded-full glass">{t(`type.${product.type}`)}</span>
-            <span className="px-2.5 py-1 rounded-full glass">{t(`subject.${product.subject}`)}</span>
+            <span className="px-2.5 py-1 rounded-full glass">
+              {t(`subject.${product.subject}`)}
+            </span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold leading-tight font-display">{product.title}</h1>
+          <h1 className="text-3xl md:text-5xl font-bold leading-tight font-display">
+            {product.title}
+          </h1>
           <p className="mt-2 text-muted-foreground">
             {t("card.by")} <span className="font-semibold text-foreground">{product.author}</span>
           </p>
 
           <div className="flex items-center gap-1 mt-4">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} className={`h-5 w-5 ${i < Math.floor(product.rating) ? "fill-amber-300 text-amber-300" : "text-muted"}`} />
+              <Star
+                key={i}
+                className={`h-5 w-5 ${i < Math.floor(product.rating) ? "fill-amber-300 text-amber-300" : "text-muted"}`}
+              />
             ))}
             <span className="ms-2 font-semibold">{product.rating}</span>
             <span className="text-sm text-muted-foreground">{t("detail.reviews", { n: 248 })}</span>
           </div>
 
-          <p className="mt-6 text-base leading-relaxed text-muted-foreground">{product.description}</p>
+          <p className="mt-6 text-base leading-relaxed text-muted-foreground">
+            {product.description}
+          </p>
 
           <div className="grid grid-cols-3 gap-3 mt-6">
-            <Info icon={Globe} label={t("detail.country")} value={t(`country.${product.country}`)} />
-            <Info icon={GraduationCap} label={t("detail.stage")} value={t(`stage.${product.stage}`)} />
+            <Info
+              icon={Globe}
+              label={t("detail.country")}
+              value={t(`country.${product.country}`)}
+            />
+            <Info
+              icon={GraduationCap}
+              label={t("detail.stage")}
+              value={t(`stage.${product.stage}`)}
+            />
             <Info icon={FileText} label={t("detail.format")} value="PDF" />
           </div>
 
           <div className="mt-8 p-6 rounded-3xl glass-strong border-gradient">
             <div className="flex items-center justify-between mb-4">
               {product.price === 0 ? (
-                <div className="text-3xl font-extrabold text-[oklch(0.78_0.20_150)] font-display">{t("card.free")}</div>
+                <div className="text-3xl font-extrabold text-[oklch(0.78_0.20_150)] font-display">
+                  {t("card.free")}
+                </div>
               ) : (
                 <div>
                   <div className="text-3xl font-extrabold text-gradient-neon font-display">
                     {formatCurrency(product.price, currency.code, lang)}
                   </div>
-                  <div className="text-xs text-muted-foreground mt-0.5 font-mono">${product.price} · {t("detail.oneTime")}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5 font-mono">
+                    ${product.price} · {t("detail.oneTime")}
+                  </div>
                 </div>
               )}
             </div>
@@ -120,18 +158,29 @@ function ProductDetail() {
             <div className="flex flex-col gap-2.5">
               {owned ? (
                 <Link to="/reader/$id" params={{ id: product.id }}>
-                  <Button size="lg" className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple hover:scale-105 transition-smooth">
+                  <Button
+                    size="lg"
+                    className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple hover:scale-105 transition-smooth"
+                  >
                     <Check className="me-2 h-5 w-5" /> {t("detail.owned")}
                   </Button>
                 </Link>
               ) : (
                 <>
                   {inCart ? (
-                    <Button onClick={handleBuyNow} size="lg" className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue">
+                    <Button
+                      onClick={handleBuyNow}
+                      size="lg"
+                      className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue"
+                    >
                       {t("checkout.payNow")} →
                     </Button>
                   ) : (
-                    <Button onClick={handleBuyNow} size="lg" className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple hover:scale-105 transition-smooth">
+                    <Button
+                      onClick={handleBuyNow}
+                      size="lg"
+                      className="w-full h-13 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple hover:scale-105 transition-smooth"
+                    >
                       <ShoppingCart className="me-2 h-5 w-5" /> {t("detail.addCart")}
                     </Button>
                   )}
@@ -150,7 +199,11 @@ function ProductDetail() {
 
               {product.type === "quiz" && owned && (
                 <Link to="/quiz/$id" params={{ id: product.id }}>
-                  <Button variant="outline" size="lg" className="w-full h-12 rounded-full glass border-white/20">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full h-12 rounded-full glass border-white/20"
+                  >
                     {t("detail.takeQuiz")}
                   </Button>
                 </Link>
@@ -170,13 +223,23 @@ function ProductDetail() {
             {related.map((p) => {
               const cur = currencyForCountry(p.country);
               return (
-                <Link key={p.id} to="/products/$id" params={{ id: p.id }}
-                  className="group block rounded-3xl overflow-hidden glass-strong border-gradient hover:shadow-glow-blue transition-smooth">
+                <Link
+                  key={p.id}
+                  to="/products/$id"
+                  params={{ id: p.id }}
+                  className="group block rounded-3xl overflow-hidden glass-strong border-gradient hover:shadow-glow-blue transition-smooth"
+                >
                   <div className="aspect-[4/3] overflow-hidden">
-                    <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-smooth" />
+                    <img
+                      src={p.image}
+                      alt={p.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-smooth"
+                    />
                   </div>
                   <div className="p-3">
-                    <div className="font-bold text-sm line-clamp-1 group-hover:text-gradient-neon">{p.title}</div>
+                    <div className="font-bold text-sm line-clamp-1 group-hover:text-gradient-neon">
+                      {p.title}
+                    </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {p.price === 0 ? t("card.free") : formatCurrency(p.price, cur.code, lang)}
                     </div>
@@ -191,11 +254,21 @@ function ProductDetail() {
   );
 }
 
-function Info({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
+function Info({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="glass rounded-2xl p-3 text-center">
       <Icon className="h-4 w-4 mx-auto text-[oklch(0.68_0.22_255)] mb-1" />
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">{label}</div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-mono">
+        {label}
+      </div>
       <div className="text-sm font-bold mt-0.5">{value}</div>
     </div>
   );
