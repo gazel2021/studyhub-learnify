@@ -104,6 +104,7 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "detail.read": "افتح واقرأ",
     "detail.preview": "معاينة مجانية",
     "detail.addCart": "أضف إلى السلة",
+    "detail.buyNow": "اشترِ الآن",
     "detail.goCart": "اذهب إلى السلة",
     "detail.takeQuiz": "ابدأ الاختبار",
     "detail.related": "موارد ذات صلة",

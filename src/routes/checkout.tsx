@@ -20,7 +20,7 @@ function CheckoutPage() {
   const t = useT();
   const lang = useI18n((s) => s.lang);
   const { items, purchase } = useCart();
-  const [method, setMethod] = useState<Method>("pi");
+  const [method, setMethod] = useState<Method>("card");
   const [done, setDone] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [piReady, setPiReady] = useState(false);
