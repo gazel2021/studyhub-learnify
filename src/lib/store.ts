@@ -76,6 +76,8 @@ export interface Product {
   createdAt: number;
   /** Optional full body content (markdown / plain text). Falls back to SAMPLE_PARAGRAPHS. */
   content?: string;
+  /** When true, full content is unlocked for everyone (admin override). */
+  unlocked?: boolean;
 }
 
 interface CartState {
