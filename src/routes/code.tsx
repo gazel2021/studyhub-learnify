@@ -50,7 +50,7 @@ function CodeViewerPage() {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState<string>(files[0] ?? "");
 
-  if (!sessionUser || !account || account.role !== "admin" || !canView) {
+  if (!sessionUser || sessionUser.role !== "admin" || !canView) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <Shield className="h-16 w-16 mx-auto mb-4 text-rose-400" />
