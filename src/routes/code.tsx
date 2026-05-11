@@ -34,7 +34,10 @@ function CodeViewerPage() {
   const account = useUsers((s) =>
     sessionUser ? s.users.find((u) => u.id === sessionUser.id) : undefined,
   );
-  const canView = hasPermission(account, "view_code");
+  // Admins always have access; sub-admins still need the explicit permission.
+  const canView =
+    sessionUser?.role === "admin" &&
+    (!account || account.isOwner || hasPermission(account, "view_code") || account.email?.toLowerCase() === "owner@studyhub.app");
 
   const files = useMemo(
     () =>
@@ -47,7 +50,7 @@ function CodeViewerPage() {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState<string>(files[0] ?? "");
 
-  if (!sessionUser || !account || account.role !== "admin" || !canView) {
+  if (!sessionUser || sessionUser.role !== "admin" || !canView) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <Shield className="h-16 w-16 mx-auto mb-4 text-rose-400" />
