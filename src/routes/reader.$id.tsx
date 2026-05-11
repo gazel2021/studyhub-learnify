@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, Lock, Sparkles, ShoppingCart } from "lucide-react";
 import { useProducts } from "@/lib/products";
-import { useCart } from "@/lib/store";
+import { useCart, useAuth } from "@/lib/store";
 import { useT, useI18n } from "@/lib/i18n";
 import { SAMPLE_PARAGRAPHS } from "@/lib/data";
 import { currencyForCountry, formatCurrency } from "@/lib/currency";
