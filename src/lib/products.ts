@@ -63,6 +63,10 @@ export const useProducts = create<ProductsState>()(
         set({
           items: get().items.map((i) => (i.id === id ? { ...i, status } : i)),
         }),
+      setUnlocked: (id, unlocked) =>
+        set({
+          items: get().items.map((i) => (i.id === id ? { ...i, unlocked } : i)),
+        }),
       reset: () => set({ items: SEED }),
     }),
     {
