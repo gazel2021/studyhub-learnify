@@ -231,6 +231,11 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "admin.type.exam": "امتحان",
     "admin.type.quiz": "اختبار",
     "admin.tab.all": "الكل",
+    "admin.unlock": "مفتوح",
+    "admin.lock": "إقفال",
+    "admin.unlocked": "تم فتح المحتوى للجميع",
+    "admin.locked": "تم قفل المحتوى",
+    "admin.view": "عرض",
 
     // Upload (teachers/students)
     "upload.title": "أضف محتوى تعليمي",
