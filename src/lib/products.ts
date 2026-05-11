@@ -25,6 +25,7 @@ interface ProductsState {
   submit: (p: NewProductInput) => Product;
   remove: (id: string) => void;
   setStatus: (id: string, status: ProductStatus) => void;
+  setUnlocked: (id: string, unlocked: boolean) => void;
   reset: () => void;
 }
 
