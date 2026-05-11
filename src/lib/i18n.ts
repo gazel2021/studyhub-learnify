@@ -231,6 +231,11 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "admin.type.exam": "امتحان",
     "admin.type.quiz": "اختبار",
     "admin.tab.all": "الكل",
+    "admin.unlock": "مفتوح",
+    "admin.lock": "إقفال",
+    "admin.unlocked": "تم فتح المحتوى للجميع",
+    "admin.locked": "تم قفل المحتوى",
+    "admin.view": "عرض",
 
     // Upload (teachers/students)
     "upload.title": "أضف محتوى تعليمي",
@@ -664,6 +669,11 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "admin.type.exam": "Exam",
     "admin.type.quiz": "Quiz",
     "admin.tab.all": "All",
+    "admin.unlock": "Unlocked",
+    "admin.lock": "Lock",
+    "admin.unlocked": "Content unlocked for everyone",
+    "admin.locked": "Content locked",
+    "admin.view": "View",
 
     "upload.title": "Add educational content",
     "upload.subtitle":
@@ -1083,6 +1093,11 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "admin.type.exam": "Examen",
     "admin.type.quiz": "Quiz",
     "admin.tab.all": "Tout",
+    "admin.unlock": "Déverrouillé",
+    "admin.lock": "Verrouiller",
+    "admin.unlocked": "Contenu déverrouillé pour tous",
+    "admin.locked": "Contenu verrouillé",
+    "admin.view": "Voir",
 
     "upload.title": "Ajouter du contenu",
     "upload.subtitle": "Partagez vos connaissances — soumis à modération.",

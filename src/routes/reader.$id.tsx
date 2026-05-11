@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, Lock, Sparkles, ShoppingCart } from "lucide-react";
 import { useProducts } from "@/lib/products";
-import { useCart } from "@/lib/store";
+import { useCart, useAuth } from "@/lib/store";
 import { useT, useI18n } from "@/lib/i18n";
 import { SAMPLE_PARAGRAPHS } from "@/lib/data";
 import { currencyForCountry, formatCurrency } from "@/lib/currency";
@@ -24,10 +24,15 @@ function ReaderPage() {
   const items = useCart((s) => s.items);
   const add = useCart((s) => s.add);
   const navigate = useNavigate();
+  const user = useAuth((s) => s.user);
 
   if (!product) throw notFound();
 
-  const owned = product.price === 0 || purchased.includes(product.id);
+  const owned =
+    product.price === 0 ||
+    product.unlocked === true ||
+    user?.role === "admin" ||
+    purchased.includes(product.id);
   const currency = currencyForCountry(product.country);
 
   // Build paragraphs (use uploaded content if available, else sample)

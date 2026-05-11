@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Plus, Trash2, Shield, FileText, ScrollText, Brain, BookOpen,
-  Check, X, Clock, ListChecks,
+  Check, X, Clock, ListChecks, Lock, Unlock, Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/store";
@@ -25,6 +25,7 @@ function AdminPage() {
   const products = useProducts((s) => s.items);
   const removeProduct = useProducts((s) => s.remove);
   const setStatus = useProducts((s) => s.setStatus);
+  const setUnlocked = useProducts((s) => s.setUnlocked);
   const [tab, setTab] = useState<"pending" | "approved" | "rejected" | "all">("pending");
 
   const buckets = useMemo(() => ({
@@ -178,6 +179,24 @@ function AdminPage() {
                             <X className="h-3.5 w-3.5 me-1" /> {t("admin.reject")}
                           </Button>
                         )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const next = !p.unlocked;
+                            setUnlocked(p.id, next);
+                            toast.success(next ? t("admin.unlocked") : t("admin.locked"));
+                          }}
+                          className={`rounded-full ${p.unlocked ? "border-emerald-400/40 text-emerald-300 hover:bg-emerald-500/10" : "border-amber-400/40 text-amber-300 hover:bg-amber-500/10"}`}
+                        >
+                          {p.unlocked ? <Unlock className="h-3.5 w-3.5 me-1" /> : <Lock className="h-3.5 w-3.5 me-1" />}
+                          {p.unlocked ? t("admin.unlock") : t("admin.lock")}
+                        </Button>
+                        <Link to="/reader/$id" params={{ id: p.id }}>
+                          <Button size="sm" variant="outline" className="rounded-full">
+                            <Eye className="h-3.5 w-3.5 me-1" /> {t("admin.view")}
+                          </Button>
+                        </Link>
                         <Button
                           variant="ghost" size="icon"
                           onClick={() => { if (confirm(t("admin.confirm"))) removeProduct(p.id); }}

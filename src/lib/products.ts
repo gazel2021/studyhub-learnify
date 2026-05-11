@@ -25,6 +25,7 @@ interface ProductsState {
   submit: (p: NewProductInput) => Product;
   remove: (id: string) => void;
   setStatus: (id: string, status: ProductStatus) => void;
+  setUnlocked: (id: string, unlocked: boolean) => void;
   reset: () => void;
 }
 
@@ -61,6 +62,10 @@ export const useProducts = create<ProductsState>()(
       setStatus: (id, status) =>
         set({
           items: get().items.map((i) => (i.id === id ? { ...i, status } : i)),
+        }),
+      setUnlocked: (id, unlocked) =>
+        set({
+          items: get().items.map((i) => (i.id === id ? { ...i, unlocked } : i)),
         }),
       reset: () => set({ items: SEED }),
     }),
