@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Plus, Trash2, Shield, FileText, ScrollText, Brain, BookOpen,
-  Check, X, Clock, ListChecks,
+  Check, X, Clock, ListChecks, Lock, Unlock, Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/store";
