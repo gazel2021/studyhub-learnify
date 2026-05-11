@@ -24,10 +24,15 @@ function ReaderPage() {
   const items = useCart((s) => s.items);
   const add = useCart((s) => s.add);
   const navigate = useNavigate();
+  const user = useAuth((s) => s.user);
 
   if (!product) throw notFound();
 
-  const owned = product.price === 0 || purchased.includes(product.id);
+  const owned =
+    product.price === 0 ||
+    product.unlocked === true ||
+    user?.role === "admin" ||
+    purchased.includes(product.id);
   const currency = currencyForCountry(product.country);
 
   // Build paragraphs (use uploaded content if available, else sample)
