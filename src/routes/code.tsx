@@ -12,22 +12,15 @@ import { Input } from "@/components/ui/input";
 // Eagerly load all src/ files as raw strings (admin-only viewer).
 // Vite resolves this at build time — no network requests at runtime.
 const RAW_FILES_ALL = import.meta.glob(
-  "/src/**/*.{ts,tsx,css,json,js,md}",
-  {
-    query: "?raw",
-    import: "default",
-    eager: true,
-    exhaustive: true,
-  },
+  [
+    "/src/**/*.{ts,tsx,css,json,js,md}",
+    "!/src/routeTree.gen.ts",
+    "!/src/integrations/supabase/types.ts",
+    "!/src/**/*.server.*",
+  ],
+  { query: "?raw", import: "default", eager: true },
 ) as Record<string, string>;
-const RAW_FILES: Record<string, string> = Object.fromEntries(
-  Object.entries(RAW_FILES_ALL).filter(
-    ([p]) =>
-      !p.endsWith("/routeTree.gen.ts") &&
-      !p.endsWith("/integrations/supabase/types.ts") &&
-      !/\.server\.[^/]+$/.test(p),
-  ),
-);
+const RAW_FILES: Record<string, string> = RAW_FILES_ALL;
 
 export const Route = createFileRoute("/code")({
   component: CodeViewerPage,
