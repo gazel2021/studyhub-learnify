@@ -664,6 +664,11 @@ const TRANSLATIONS: Record<Lang, Dict> = {
     "admin.type.exam": "Exam",
     "admin.type.quiz": "Quiz",
     "admin.tab.all": "All",
+    "admin.unlock": "Unlocked",
+    "admin.lock": "Lock",
+    "admin.unlocked": "Content unlocked for everyone",
+    "admin.locked": "Content locked",
+    "admin.view": "View",
 
     "upload.title": "Add educational content",
     "upload.subtitle":
