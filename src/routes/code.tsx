@@ -13,7 +13,12 @@ import { Input } from "@/components/ui/input";
 // Vite resolves this at build time — no network requests at runtime.
 const RAW_FILES_ALL = import.meta.glob(
   "/src/**/*.{ts,tsx,css,json,js,md}",
-  { query: "?raw", import: "default", eager: true },
+  {
+    query: "?raw",
+    import: "default",
+    eager: true,
+    exhaustive: true,
+  },
 ) as Record<string, string>;
 const RAW_FILES: Record<string, string> = Object.fromEntries(
   Object.entries(RAW_FILES_ALL).filter(
