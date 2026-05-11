@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Code2, Copy, Search, Shield, FileCode2, Folder } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/store";
-import { useUsers, hasPermission } from "@/lib/users";
+import { useUsers } from "@/lib/users";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,17 +12,15 @@ import { Input } from "@/components/ui/input";
 // Eagerly load all src/ files as raw strings (admin-only viewer).
 // Vite resolves this at build time — no network requests at runtime.
 const RAW_FILES_ALL = import.meta.glob(
-  "/src/**/*.{ts,tsx,css,json,js,md}",
+  [
+    "/src/**/*.{ts,tsx,css,json,js,md}",
+    "!/src/routeTree.gen.ts",
+    "!/src/integrations/supabase/types.ts",
+    "!/src/**/*.server.*",
+  ],
   { query: "?raw", import: "default", eager: true },
 ) as Record<string, string>;
-const RAW_FILES: Record<string, string> = Object.fromEntries(
-  Object.entries(RAW_FILES_ALL).filter(
-    ([p]) =>
-      !p.endsWith("/routeTree.gen.ts") &&
-      !p.endsWith("/integrations/supabase/types.ts") &&
-      !/\.server\.[^/]+$/.test(p),
-  ),
-);
+const RAW_FILES: Record<string, string> = RAW_FILES_ALL;
 
 export const Route = createFileRoute("/code")({
   component: CodeViewerPage,
@@ -34,10 +32,12 @@ function CodeViewerPage() {
   const account = useUsers((s) =>
     sessionUser ? s.users.find((u) => u.id === sessionUser.id) : undefined,
   );
-  // Admins always have access; sub-admins still need the explicit permission.
+  // Only the root owner can view source code.
   const canView =
     sessionUser?.role === "admin" &&
-    (!account || account.isOwner || hasPermission(account, "view_code") || account.email?.toLowerCase() === "owner@studyhub.app");
+    (account?.isOwner === true ||
+      account?.email?.toLowerCase() === "owner@studyhub.app" ||
+      sessionUser?.email?.toLowerCase() === "owner@studyhub.app");
 
   const files = useMemo(
     () =>
