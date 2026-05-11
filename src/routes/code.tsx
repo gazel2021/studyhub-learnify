@@ -32,10 +32,12 @@ function CodeViewerPage() {
   const account = useUsers((s) =>
     sessionUser ? s.users.find((u) => u.id === sessionUser.id) : undefined,
   );
-  // Admins always have access; sub-admins still need the explicit permission.
+  // Only the root owner can view source code.
   const canView =
     sessionUser?.role === "admin" &&
-    (!account || account.isOwner || hasPermission(account, "view_code") || account.email?.toLowerCase() === "owner@studyhub.app");
+    (account?.isOwner === true ||
+      account?.email?.toLowerCase() === "owner@studyhub.app" ||
+      sessionUser?.email?.toLowerCase() === "owner@studyhub.app");
 
   const files = useMemo(
     () =>
