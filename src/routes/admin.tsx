@@ -25,6 +25,7 @@ function AdminPage() {
   const products = useProducts((s) => s.items);
   const removeProduct = useProducts((s) => s.remove);
   const setStatus = useProducts((s) => s.setStatus);
+  const setUnlocked = useProducts((s) => s.setUnlocked);
   const [tab, setTab] = useState<"pending" | "approved" | "rejected" | "all">("pending");
 
   const buckets = useMemo(() => ({
