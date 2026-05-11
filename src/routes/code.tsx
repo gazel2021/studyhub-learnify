@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Code2, Copy, Search, Shield, FileCode2, Folder } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/store";
-import { useUsers, hasPermission } from "@/lib/users";
+import { useUsers } from "@/lib/users";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
