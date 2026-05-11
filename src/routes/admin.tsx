@@ -180,6 +180,24 @@ function AdminPage() {
                           </Button>
                         )}
                         <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const next = !p.unlocked;
+                            setUnlocked(p.id, next);
+                            toast.success(next ? t("admin.unlocked") : t("admin.locked"));
+                          }}
+                          className={`rounded-full ${p.unlocked ? "border-emerald-400/40 text-emerald-300 hover:bg-emerald-500/10" : "border-amber-400/40 text-amber-300 hover:bg-amber-500/10"}`}
+                        >
+                          {p.unlocked ? <Unlock className="h-3.5 w-3.5 me-1" /> : <Lock className="h-3.5 w-3.5 me-1" />}
+                          {p.unlocked ? t("admin.unlock") : t("admin.lock")}
+                        </Button>
+                        <Link to="/reader/$id" params={{ id: p.id }}>
+                          <Button size="sm" variant="outline" className="rounded-full">
+                            <Eye className="h-3.5 w-3.5 me-1" /> {t("admin.view")}
+                          </Button>
+                        </Link>
+                        <Button
                           variant="ghost" size="icon"
                           onClick={() => { if (confirm(t("admin.confirm"))) removeProduct(p.id); }}
                           className="rounded-full text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
