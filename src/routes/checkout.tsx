@@ -22,6 +22,10 @@ function CheckoutPage() {
   const t = useT();
   const lang = useI18n((s) => s.lang);
   const { items, purchase } = useCart();
+  const getByCode = useAffiliate((s) => s.getByCode);
+  const recordSale = useAffiliate((s) => s.recordSale);
+  const defaultPercent = useAffiliate((s) => s.defaultPercent);
+  const productsAll = useProducts((s) => s.items);
   const [method, setMethod] = useState<Method>("card");
   const [done, setDone] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -31,6 +35,30 @@ function CheckoutPage() {
   const totalUsd = items.reduce((s, i) => s + i.price, 0);
   const totalPi = usdToPi(totalUsd);
   const inPiBrowser = typeof window !== "undefined" && isPiBrowser();
+
+  const attributeSales = () => {
+    const refCode = getActiveRef();
+    if (!refCode) return;
+    const app = getByCode(refCode);
+    if (!app) return;
+    // Skip self-referral
+    items.forEach((cartItem) => {
+      const product = productsAll.find((p) => p.id === cartItem.id) ?? cartItem;
+      if (product.ownerId === app.userId) return;
+      const percent = product.commissionPercent ?? defaultPercent;
+      if (percent <= 0 || cartItem.price <= 0) return;
+      const commission = +(cartItem.price * (percent / 100)).toFixed(2);
+      recordSale({
+        affiliateUserId: app.userId,
+        productId: cartItem.id,
+        productTitle: cartItem.title,
+        amountUsd: cartItem.price,
+        commissionUsd: commission,
+        commissionPercent: percent,
+      });
+    });
+    clearRef();
+  };
 
   // Default currency from first item
   const defaultCurrency = items[0] ? currencyForCountry(items[0].country).code : "USD";
