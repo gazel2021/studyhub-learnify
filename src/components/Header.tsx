@@ -37,6 +37,7 @@ export function Header() {
     { to: "/products", label: t("nav.browse") },
     { to: "/dashboard", label: t("nav.dashboard") },
     ...(user ? [{ to: "/upload", label: t("nav.upload") }] : []),
+    ...(user ? [{ to: "/affiliate", label: t("nav.affiliate") }] : []),
     ...(user?.role === "admin" ? [{ to: "/admin", label: t("nav.admin") }] : []),
   ];
 
