@@ -78,6 +78,8 @@ export interface Product {
   content?: string;
   /** When true, full content is unlocked for everyone (admin override). */
   unlocked?: boolean;
+  /** Affiliate commission percent for this product (0–90). If undefined, uses store default. */
+  commissionPercent?: number;
 }
 
 interface CartState {

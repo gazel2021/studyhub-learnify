@@ -26,6 +26,7 @@ interface ProductsState {
   remove: (id: string) => void;
   setStatus: (id: string, status: ProductStatus) => void;
   setUnlocked: (id: string, unlocked: boolean) => void;
+  setCommission: (id: string, percent: number | undefined) => void;
   reset: () => void;
 }
 
@@ -66,6 +67,14 @@ export const useProducts = create<ProductsState>()(
       setUnlocked: (id, unlocked) =>
         set({
           items: get().items.map((i) => (i.id === id ? { ...i, unlocked } : i)),
+        }),
+      setCommission: (id, percent) =>
+        set({
+          items: get().items.map((i) =>
+            i.id === id
+              ? { ...i, commissionPercent: percent === undefined ? undefined : Math.max(0, Math.min(90, percent)) }
+              : i,
+          ),
         }),
       reset: () => set({ items: SEED }),
     }),

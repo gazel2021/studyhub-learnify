@@ -3,13 +3,15 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Plus, Trash2, Shield, FileText, ScrollText, Brain, BookOpen,
-  Check, X, Clock, ListChecks, Lock, Unlock, Eye,
+  Check, X, Clock, ListChecks, Lock, Unlock, Eye, Share2, Wallet, Percent,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/store";
 import { useProducts } from "@/lib/products";
+import { useAffiliate } from "@/lib/affiliate";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/admin")({
@@ -213,7 +215,187 @@ function AdminPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <AffiliateAdminSection t={t} />
     </div>
+  );
+}
+
+function AffiliateAdminSection({ t }: { t: (k: string) => string }) {
+  const apps = useAffiliate((s) => s.apps);
+  const withdrawals = useAffiliate((s) => s.withdrawals);
+  const approveApp = useAffiliate((s) => s.approveApp);
+  const rejectApp = useAffiliate((s) => s.rejectApp);
+  const markPaid = useAffiliate((s) => s.markPaid);
+  const rejectWithdraw = useAffiliate((s) => s.rejectWithdraw);
+  const defaultPercent = useAffiliate((s) => s.defaultPercent);
+  const setDefaultPercent = useAffiliate((s) => s.setDefaultPercent);
+  const products = useProducts((s) => s.items);
+  const setCommission = useProducts((s) => s.setCommission);
+  const [tab, setTab] = useState<"apps" | "withdrawals" | "commissions">("apps");
+
+  return (
+    <div className="mt-12">
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs font-bold uppercase tracking-wider mb-3">
+            <Share2 className="h-3.5 w-3.5 text-[oklch(0.66_0.24_295)]" />
+            <span>{t("nav.affiliate")}</span>
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold font-display tracking-tight">{t("admin.aff.t")}</h2>
+        </div>
+        <div className="flex items-center gap-2 glass rounded-full px-3 py-2">
+          <Percent className="h-4 w-4 text-[oklch(0.66_0.24_295)]" />
+          <span className="text-xs text-muted-foreground">{t("admin.aff.defaultPercent")}</span>
+          <Input
+            type="number"
+            min={0}
+            max={90}
+            value={defaultPercent}
+            onChange={(e) => setDefaultPercent(parseInt(e.target.value, 10) || 0)}
+            className="h-8 w-20 bg-background/50 rounded-lg"
+          />
+        </div>
+      </div>
+
+      <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
+        <TabsList className="glass rounded-full p-1 mb-6">
+          <TabsTrigger value="apps" className="rounded-full data-[state=active]:bg-gradient-neon data-[state=active]:text-white">
+            {t("admin.aff.tab.apps")} ({apps.filter((a) => a.status === "pending").length})
+          </TabsTrigger>
+          <TabsTrigger value="withdrawals" className="rounded-full data-[state=active]:bg-gradient-neon data-[state=active]:text-white">
+            {t("admin.aff.tab.withdrawals")} ({withdrawals.filter((w) => w.status === "pending").length})
+          </TabsTrigger>
+          <TabsTrigger value="commissions" className="rounded-full data-[state=active]:bg-gradient-neon data-[state=active]:text-white">
+            {t("admin.aff.tab.commissions")}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="apps">
+          <div className="glass rounded-3xl p-4 md:p-6">
+            {apps.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">{t("admin.aff.appsEmpty")}</div>
+            ) : (
+              <div className="grid gap-3">
+                {apps.map((a) => (
+                  <div key={a.userId} className="flex flex-wrap items-center gap-4 p-3 rounded-2xl bg-background/40 border border-white/5">
+                    <div className="flex-1 min-w-[200px]">
+                      <div className="font-bold">{a.userName}</div>
+                      <div className="text-xs text-muted-foreground">{a.userEmail}</div>
+                      {a.note && <div className="text-xs text-muted-foreground mt-1 line-clamp-2">"{a.note}"</div>}
+                      <div className="text-[10px] font-mono mt-1 text-[oklch(0.66_0.24_295)]">{a.code}</div>
+                    </div>
+                    <StatusPill status={a.status} t={t} />
+                    <div className="flex items-center gap-1.5">
+                      {a.status !== "approved" && (
+                        <Button size="sm" onClick={() => { approveApp(a.userId); toast.success(t("admin.aff.approve")); }}
+                          className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white">
+                          <Check className="h-3.5 w-3.5 me-1" /> {t("admin.aff.approve")}
+                        </Button>
+                      )}
+                      {a.status !== "rejected" && (
+                        <Button size="sm" variant="outline" onClick={() => { rejectApp(a.userId); toast(t("admin.aff.reject")); }}
+                          className="rounded-full border-rose-400/40 text-rose-300 hover:bg-rose-500/10">
+                          <X className="h-3.5 w-3.5 me-1" /> {t("admin.aff.reject")}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="withdrawals">
+          <div className="glass rounded-3xl p-4 md:p-6">
+            {withdrawals.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">{t("admin.aff.withdrawalsEmpty")}</div>
+            ) : (
+              <div className="grid gap-3">
+                {withdrawals.map((w) => {
+                  const app = apps.find((a) => a.userId === w.affiliateUserId);
+                  return (
+                    <div key={w.id} className="flex flex-wrap items-center gap-4 p-3 rounded-2xl bg-background/40 border border-white/5">
+                      <Wallet className="h-5 w-5 text-[oklch(0.78_0.18_65)]" />
+                      <div className="flex-1 min-w-[200px]">
+                        <div className="font-bold">{app?.userName ?? w.affiliateUserId}</div>
+                        <div className="text-xs text-muted-foreground">{w.method} · {w.details}</div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">{new Date(w.requestedAt).toLocaleString()}</div>
+                      </div>
+                      <div className="font-extrabold text-gradient-neon">${w.amountUsd.toFixed(2)}</div>
+                      <StatusPill status={w.status} t={t} />
+                      {w.status === "pending" && (
+                        <div className="flex items-center gap-1.5">
+                          <Button size="sm" onClick={() => { markPaid(w.id); toast.success(t("admin.aff.markPaid")); }}
+                            className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white">
+                            <Check className="h-3.5 w-3.5 me-1" /> {t("admin.aff.markPaid")}
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => { rejectWithdraw(w.id); toast(t("admin.aff.reject")); }}
+                            className="rounded-full border-rose-400/40 text-rose-300 hover:bg-rose-500/10">
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="commissions">
+          <div className="glass rounded-3xl p-4 md:p-6">
+            <div className="grid gap-3">
+              {products.map((p) => (
+                <div key={p.id} className="flex flex-wrap items-center gap-3 p-3 rounded-2xl bg-background/40 border border-white/5">
+                  <img src={p.image} alt={p.title} className="h-12 w-12 rounded-lg object-cover" />
+                  <div className="flex-1 min-w-[200px]">
+                    <div className="font-bold text-sm line-clamp-1">{p.title}</div>
+                    <div className="text-xs text-muted-foreground">${p.price}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">{t("admin.aff.commission")}</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={90}
+                      placeholder={t("admin.aff.commissionPh")}
+                      value={p.commissionPercent ?? ""}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setCommission(p.id, v === "" ? undefined : parseInt(v, 10) || 0);
+                      }}
+                      className="h-9 w-20 bg-background/50 rounded-lg"
+                    />
+                    <span className="text-xs font-mono text-muted-foreground">%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function StatusPill({ status, t }: { status: string; t: (k: string) => string }) {
+  const map: Record<string, string> = {
+    pending: "bg-amber-500/15 text-amber-300 border-amber-400/30",
+    approved: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
+    rejected: "bg-rose-500/15 text-rose-300 border-rose-400/30",
+    paid: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
+  };
+  const labelKey =
+    status === "paid" || status === "rejected" || status === "pending"
+      ? `aff.withdraw.status.${status}`
+      : `aff.status.${status}`;
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border ${map[status] ?? ""}`}>
+      {t(labelKey)}
+    </span>
   );
 }
 

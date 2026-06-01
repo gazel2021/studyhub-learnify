@@ -1,4 +1,5 @@
 import { Outlet, createRootRoute, HeadContent, Scripts, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
@@ -80,6 +81,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   useI18nInit();
+  useRefCapture();
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -90,4 +92,29 @@ function RootComponent() {
       <Toaster position="top-center" />
     </div>
   );
+}
+
+function useRefCapture() {
+  if (typeof window === "undefined") return;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffectOnce(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref) {
+        // dynamic import to avoid SSR pull
+        import("@/lib/affiliate").then((m) => m.captureRef(ref));
+      }
+    } catch {
+      /* ignore */
+    }
+  });
+}
+
+function useEffectOnce(fn: () => void) {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    fn();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 }

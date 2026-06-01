@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Moon, Sun, GraduationCap, ShoppingCart, User as UserIcon, Menu, Sparkles, Languages, Shield, Settings as SettingsIcon, Code2, Upload as UploadIcon } from "lucide-react";
+import { Moon, Sun, GraduationCap, ShoppingCart, User as UserIcon, Menu, Sparkles, Languages, Shield, Settings as SettingsIcon, Code2, Upload as UploadIcon, Share2 } from "lucide-react";
 import { useTheme, useAuth, useCart } from "@/lib/store";
 import { useUsers, hasPermission } from "@/lib/users";
 import { useSettings } from "@/lib/settings";
@@ -37,6 +37,7 @@ export function Header() {
     { to: "/products", label: t("nav.browse") },
     { to: "/dashboard", label: t("nav.dashboard") },
     ...(user ? [{ to: "/upload", label: t("nav.upload") }] : []),
+    ...(user ? [{ to: "/affiliate", label: t("nav.affiliate") }] : []),
     ...(user?.role === "admin" ? [{ to: "/admin", label: t("nav.admin") }] : []),
   ];
 
@@ -158,6 +159,12 @@ export function Header() {
                     <Link to="/upload">
                       <UploadIcon className="h-3.5 w-3.5 me-2" />
                       {t("nav.upload")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <Link to="/affiliate">
+                      <Share2 className="h-3.5 w-3.5 me-2" />
+                      {t("nav.affiliate")}
                     </Link>
                   </DropdownMenuItem>
                   {user.role === "admin" && (
