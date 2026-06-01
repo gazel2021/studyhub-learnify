@@ -105,6 +105,7 @@ function CheckoutPage() {
   const handlePayMock = () => {
     setProcessing(true);
     setTimeout(() => {
+      attributeSales();
       purchase(); setDone(true); setProcessing(false);
       toast.success(t("checkout.success.t"));
     }, 1100);
