@@ -91,6 +91,7 @@ function CheckoutPage() {
       { amount: totalPi, memo: `StudyHub purchase (${items.length})`, metadata: { items: items.map((i) => i.id), totalUsd } },
       {
         onReadyForServerCompletion: () => {
+          attributeSales();
           purchase(); setDone(true); setProcessing(false);
           toast.success(t("checkout.success.t"));
         },
