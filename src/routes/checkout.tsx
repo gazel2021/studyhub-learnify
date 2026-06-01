@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { authenticateWithPi, createPiPayment, isPiBrowser, loadPiSdk, usdToPi } from "@/lib/pi";
+import { useAffiliate, getActiveRef, clearRef } from "@/lib/affiliate";
+import { useProducts } from "@/lib/products";
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
