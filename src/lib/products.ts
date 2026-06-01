@@ -68,6 +68,14 @@ export const useProducts = create<ProductsState>()(
         set({
           items: get().items.map((i) => (i.id === id ? { ...i, unlocked } : i)),
         }),
+      setCommission: (id, percent) =>
+        set({
+          items: get().items.map((i) =>
+            i.id === id
+              ? { ...i, commissionPercent: percent === undefined ? undefined : Math.max(0, Math.min(90, percent)) }
+              : i,
+          ),
+        }),
       reset: () => set({ items: SEED }),
     }),
     {
