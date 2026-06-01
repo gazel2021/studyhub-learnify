@@ -26,6 +26,7 @@ interface ProductsState {
   remove: (id: string) => void;
   setStatus: (id: string, status: ProductStatus) => void;
   setUnlocked: (id: string, unlocked: boolean) => void;
+  setCommission: (id: string, percent: number | undefined) => void;
   reset: () => void;
 }
 
