@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Moon, Sun, GraduationCap, ShoppingCart, User as UserIcon, Menu, Sparkles, Languages, Shield, Settings as SettingsIcon, Code2, Upload as UploadIcon } from "lucide-react";
+import { Moon, Sun, GraduationCap, ShoppingCart, User as UserIcon, Menu, Sparkles, Languages, Shield, Settings as SettingsIcon, Code2, Upload as UploadIcon, Share2 } from "lucide-react";
 import { useTheme, useAuth, useCart } from "@/lib/store";
 import { useUsers, hasPermission } from "@/lib/users";
 import { useSettings } from "@/lib/settings";
