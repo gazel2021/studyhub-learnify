@@ -3,13 +3,15 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Plus, Trash2, Shield, FileText, ScrollText, Brain, BookOpen,
-  Check, X, Clock, ListChecks, Lock, Unlock, Eye,
+  Check, X, Clock, ListChecks, Lock, Unlock, Eye, Share2, Wallet, Percent,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/store";
 import { useProducts } from "@/lib/products";
+import { useAffiliate } from "@/lib/affiliate";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/admin")({
