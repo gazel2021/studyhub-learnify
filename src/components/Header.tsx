@@ -161,6 +161,12 @@ export function Header() {
                       {t("nav.upload")}
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <Link to="/affiliate">
+                      <Share2 className="h-3.5 w-3.5 me-2" />
+                      {t("nav.affiliate")}
+                    </Link>
+                  </DropdownMenuItem>
                   {user.role === "admin" && (
                     <>
                       <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
