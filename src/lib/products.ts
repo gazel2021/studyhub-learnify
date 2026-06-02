@@ -15,6 +15,8 @@ export interface NewProductInput {
   image?: string;
   pages?: number;
   content?: string;
+  fileUrl?: string;
+  fileName?: string;
   ownerId: string;
   ownerRole: Role;
 }
