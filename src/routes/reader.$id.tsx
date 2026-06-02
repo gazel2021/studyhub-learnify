@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, Lock, Sparkles, ShoppingCart } from "lucide-react";
+import { ArrowLeft, BookOpen, Lock, Sparkles, ShoppingCart, Download } from "lucide-react";
 import { useProducts } from "@/lib/products";
 import { useCart, useAuth } from "@/lib/store";
 import { useT, useI18n } from "@/lib/i18n";
