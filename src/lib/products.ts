@@ -56,6 +56,8 @@ export const useProducts = create<ProductsState>()(
           ownerRole: p.ownerRole,
           pages: p.pages,
           content: p.content,
+          fileUrl: p.fileUrl,
+          fileName: p.fileName,
           createdAt: Date.now(),
         };
         set({ items: [product, ...get().items] });
