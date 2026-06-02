@@ -58,7 +58,62 @@ function UploadPage() {
     image: "",
     pages: "",
     content: "",
+    fileUrl: "",
+    fileName: "",
   });
+
+  const readFileAsDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.onerror = () => reject(r.error);
+      r.readAsDataURL(file);
+    });
+  const readFileAsText = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.onerror = () => reject(r.error);
+      r.readAsText(file);
+    });
+
+  const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8 MB
+
+  const handleImageFile = async (file?: File | null) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("الرجاء اختيار صورة");
+      return;
+    }
+    if (file.size > MAX_FILE_BYTES) {
+      toast.error("الحجم الأقصى 8 ميجابايت");
+      return;
+    }
+    const url = await readFileAsDataUrl(file);
+    setForm((f) => ({ ...f, image: url }));
+    toast.success("تم رفع الصورة");
+  };
+
+  const handleContentFile = async (file?: File | null) => {
+    if (!file) return;
+    if (file.size > MAX_FILE_BYTES) {
+      toast.error("الحجم الأقصى 8 ميجابايت");
+      return;
+    }
+    const isText =
+      file.type.startsWith("text/") ||
+      /\.(txt|md|markdown|html|json|csv)$/i.test(file.name);
+    if (isText) {
+      const text = await readFileAsText(file);
+      setForm((f) => ({ ...f, content: text, fileName: file.name, fileUrl: "" }));
+      toast.success("تم رفع محتوى الملف");
+    } else {
+      const url = await readFileAsDataUrl(file);
+      setForm((f) => ({ ...f, fileUrl: url, fileName: file.name }));
+      toast.success("تم رفع الملف");
+    }
+  };
+
 
   if (!user) {
     return (
