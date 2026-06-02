@@ -76,6 +76,10 @@ export interface Product {
   createdAt: number;
   /** Optional full body content (markdown / plain text). Falls back to SAMPLE_PARAGRAPHS. */
   content?: string;
+  /** Uploaded file as data URL (PDF, doc, etc.). */
+  fileUrl?: string;
+  /** Original filename of the uploaded file. */
+  fileName?: string;
   /** When true, full content is unlocked for everyone (admin override). */
   unlocked?: boolean;
   /** Affiliate commission percent for this product (0–90). If undefined, uses store default. */

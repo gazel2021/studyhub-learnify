@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, Lock, Sparkles, ShoppingCart } from "lucide-react";
+import { ArrowLeft, BookOpen, Lock, Sparkles, ShoppingCart, Download } from "lucide-react";
 import { useProducts } from "@/lib/products";
 import { useCart, useAuth } from "@/lib/store";
 import { useT, useI18n } from "@/lib/i18n";
@@ -80,6 +80,17 @@ function ReaderPage() {
             </div>
           )}
         </div>
+
+        {product.fileUrl && owned && (
+          <a
+            href={product.fileUrl}
+            download={product.fileName || product.title}
+            className="mt-5 inline-flex items-center gap-2 rounded-2xl glass border border-white/10 px-4 py-3 text-sm font-semibold hover:bg-white/5 transition-smooth"
+          >
+            <Download className="h-4 w-4 text-[oklch(0.66_0.24_295)]" />
+            تحميل الملف {product.fileName ? `(${product.fileName})` : ""}
+          </a>
+        )}
 
         {!owned && (
           <div className="mt-5 mb-6 rounded-2xl glass border border-amber-400/30 p-3 text-sm flex items-center gap-2 text-amber-300">

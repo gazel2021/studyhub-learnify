@@ -15,6 +15,8 @@ export interface NewProductInput {
   image?: string;
   pages?: number;
   content?: string;
+  fileUrl?: string;
+  fileName?: string;
   ownerId: string;
   ownerRole: Role;
 }
@@ -54,6 +56,8 @@ export const useProducts = create<ProductsState>()(
           ownerRole: p.ownerRole,
           pages: p.pages,
           content: p.content,
+          fileUrl: p.fileUrl,
+          fileName: p.fileName,
           createdAt: Date.now(),
         };
         set({ items: [product, ...get().items] });
