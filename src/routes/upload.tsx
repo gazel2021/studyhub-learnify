@@ -148,6 +148,8 @@ function UploadPage() {
       image: form.image || undefined,
       pages: form.pages ? parseInt(form.pages, 10) : undefined,
       content: form.content || undefined,
+      fileUrl: form.fileUrl || undefined,
+      fileName: form.fileName || undefined,
       ownerId: user.id,
       ownerRole: user.role,
     });
