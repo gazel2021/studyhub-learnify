@@ -294,14 +294,43 @@ function UploadPage() {
           </Field>
 
           <Field label={t("admin.form.image")} className="md:col-span-2">
-            <Input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })}
-              placeholder="https://..." className="h-11 rounded-xl bg-background/50" />
+            <div className="grid gap-2 md:grid-cols-[1fr_auto] items-center">
+              <Input value={form.image.startsWith("data:") ? "" : form.image}
+                onChange={(e) => setForm({ ...form, image: e.target.value })}
+                placeholder="https://..." className="h-11 rounded-xl bg-background/50" />
+              <Input type="file" accept="image/*"
+                onChange={(e) => handleImageFile(e.target.files?.[0])}
+                className="h-11 rounded-xl bg-background/50 cursor-pointer file:me-3 file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-1 file:text-sm" />
+            </div>
+            {form.image && (
+              <div className="mt-2 flex items-center gap-2">
+                <img src={form.image} alt="" className="h-14 w-14 rounded-lg object-cover" />
+                <Button type="button" variant="outline" size="sm"
+                  onClick={() => setForm({ ...form, image: "" })}>إزالة</Button>
+              </div>
+            )}
+          </Field>
+
+          <Field label="رفع ملف (PDF / Word / نص)" className="md:col-span-2">
+            <Input type="file"
+              accept=".pdf,.doc,.docx,.txt,.md,.rtf,.odt,.ppt,.pptx,.xls,.xlsx,application/pdf,text/*"
+              onChange={(e) => handleContentFile(e.target.files?.[0])}
+              className="h-11 rounded-xl bg-background/50 cursor-pointer file:me-3 file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-1 file:text-sm" />
+            {form.fileName && (
+              <div className="mt-2 flex items-center gap-2 text-sm">
+                <FileText className="h-4 w-4 text-[oklch(0.66_0.24_295)]" />
+                <span className="font-medium">{form.fileName}</span>
+                <Button type="button" variant="outline" size="sm"
+                  onClick={() => setForm({ ...form, fileUrl: "", fileName: "" })}>إزالة</Button>
+              </div>
+            )}
           </Field>
 
           <Field label={t("admin.form.content")} className="md:col-span-2">
             <Textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })}
               rows={6} className="rounded-xl bg-background/50 font-mono text-sm" />
           </Field>
+
 
           <div className="md:col-span-2 flex flex-wrap gap-3 mt-2">
             <Button type="submit" className="h-12 px-8 rounded-full bg-gradient-neon text-white font-bold shadow-glow-blue hover:shadow-glow-purple hover:scale-105 transition-smooth">
